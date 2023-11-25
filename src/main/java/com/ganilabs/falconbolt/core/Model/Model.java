@@ -1,9 +1,13 @@
 package com.ganilabs.falconbolt.core.Model;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Model {
+    private static final Logger LOGGER = LogManager.getLogger(Model.class);
     private final Set<ModelObserver> observers= new HashSet<>();
 
     private static Model model;
@@ -11,7 +15,7 @@ public class Model {
 
     public static Model getSingleton(){
         if(model == null){
-            System.out.println("Creating new Model singleton in core");
+            LOGGER.info("Creating new Model singleton in core");
             model = new Model();
             return model;
         }
@@ -19,7 +23,7 @@ public class Model {
     }
 
     public void addModelObserver(ModelObserver observer){
-        System.out.println("Registering new observer in Core Model");
+        LOGGER.info("Registering new observer in Core Model");
         this.observers.add(observer);
     }
 

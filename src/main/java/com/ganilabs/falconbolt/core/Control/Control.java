@@ -1,9 +1,12 @@
 package com.ganilabs.falconbolt.core.Control;
 
 import com.ganilabs.falconbolt.core.Model.Model;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Control {
     private static Control control;
+    private static final Logger LOGGER = LogManager.getLogger(Control.class);
     private Model model;
     private Control(){};
     public static Control getSingleton() throws IllegalStateException{
@@ -17,13 +20,13 @@ public class Control {
         if(control != null){
             return control;
         }
-        System.out.println("Creating new Controller in Core");
+        LOGGER.info("Creating new Controller in Core");
         control = new Control();
         control.model = model;
         return control;
     }
 
     public void init(){
-        System.out.println("Initializing Core Controller");
+        LOGGER.info("Initializing controller");
     }
 }

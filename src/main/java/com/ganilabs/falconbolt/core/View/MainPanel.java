@@ -2,6 +2,7 @@ package com.ganilabs.falconbolt.core.View;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.logging.LogManager;
 
 public class MainPanel extends JPanel{
     private JPanel workArea = new JPanel();

@@ -5,11 +5,15 @@ import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import javax.swing.*;
 import java.awt.*;
 
 public class View implements ModelObserver {
+    private static final Logger LOGGER = LogManager.getLogger(View.class);
     private static View view;
     private Model model;
     private Control control;
@@ -21,7 +25,7 @@ public class View implements ModelObserver {
     }
     public static View getSingleton() throws IllegalStateException{
         if(view == null){
-            throw new IllegalStateException("Initialize the singleton first");
+            throw new IllegalStateException("Singleton View has not been initialized");
         }
         return view;
     }
@@ -37,22 +41,8 @@ public class View implements ModelObserver {
     }
 
     public void init(){
-        try{
-            this.model.addModelObserver(this);
-            mainFrame = new MainFrame();
-            mainPanel = new MainPanel(new BorderLayout());
-            statusBar = new StatusBarPanel();
-            mainPanel.loadWorkView(new WelcomeWorkView());
-            mainFrame.setContentPane(new JPanel(new BorderLayout()));
-            mainFrame.getContentPane().add(mainPanel , BorderLayout.CENTER);
-            mainFrame.getContentPane().add(statusBar , BorderLayout.SOUTH);
-            mainFrame.setTitle(Constant.APP_TITLE);
-            mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            mainFrame.setSize(400 , 400);
-        } catch (Exception e){
-            e.printStackTrace();
-            System.exit(1);
-        }
+        this.model.addModelObserver(this);
+        this.initializeUI();
     }
 
     public void setView (AbstractWorkView view){
@@ -72,7 +62,7 @@ public class View implements ModelObserver {
                 }
             });
         }catch(Exception e){
-            e.printStackTrace();
+            LOGGER.fatal(e.getMessage() , e);
             System.exit(1);
         }
     }
@@ -83,5 +73,24 @@ public class View implements ModelObserver {
            case Constant.ModelChangeMessages.NEW_PLUGIN_FOUND:
                System.out.println("new plugon discovered in model");
        }
+    }
+
+    private void initializeUI(){
+        try{
+            LOGGER.info("Initializing the UI");
+            mainFrame = new MainFrame();
+            mainPanel = new MainPanel(new BorderLayout());
+            statusBar = new StatusBarPanel();
+            mainPanel.loadWorkView(new WelcomeWorkView());
+            mainFrame.setContentPane(new JPanel(new BorderLayout()));
+            mainFrame.getContentPane().add(mainPanel , BorderLayout.CENTER);
+            mainFrame.getContentPane().add(statusBar , BorderLayout.SOUTH);
+            mainFrame.setTitle(Constant.APP_TITLE);
+            mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            mainFrame.setSize(400 , 400);
+        } catch (Exception e){
+            LOGGER.fatal(e.getMessage() , e);
+            System.exit(1);
+        }
     }
 }
