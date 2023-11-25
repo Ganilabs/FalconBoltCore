@@ -1,27 +1,33 @@
 package com.ganilabs.falconbolt.core.View;
 
 import com.ganilabs.falconbolt.core.Constant;
+import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
-public class View {
+public class View implements ModelObserver {
     private static View view;
+    private Model model;
     private MainFrame mainFrame;
     private MainPanel mainPanel;
     private StatusBarPanel statusBar;
 
     private View(){
     }
-    public static View getSingleton(){
-        if(view == null) return new View();
-        else return view;
+    public static View getSingleton(Model model){
+        if(view == null){
+            view = new View();
+            view.model = model;
+        }
+        return view;
     }
 
     public void init(){
         try{
+            this.model.addModelObserver(this);
             mainFrame = new MainFrame();
             mainPanel = new MainPanel(new BorderLayout());
             statusBar = new StatusBarPanel();
@@ -58,5 +64,13 @@ public class View {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    @Override
+    public void update(String changeMessage) {
+       switch (changeMessage){
+           case Constant.ModelChangeMessages.NEW_PLUGIN_FOUND:
+               System.out.println("new plugon discovered in model");
+       }
     }
 }
