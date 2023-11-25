@@ -4,13 +4,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Model {
-    private Set<ModelObserver> observers= new HashSet<>();
+    private final Set<ModelObserver> observers= new HashSet<>();
 
     private static Model model;
     private Model(){};
 
     public static Model getSingleton(){
         if(model == null){
+            System.out.println("Creating new Model singleton in core");
             model = new Model();
             return model;
         }
@@ -18,6 +19,7 @@ public class Model {
     }
 
     public void addModelObserver(ModelObserver observer){
+        System.out.println("Registering new observer in Core Model");
         this.observers.add(observer);
     }
 

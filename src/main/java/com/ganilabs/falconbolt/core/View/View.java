@@ -1,6 +1,7 @@
 package com.ganilabs.falconbolt.core.View;
 
 import com.ganilabs.falconbolt.core.Constant;
+import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
@@ -11,17 +12,27 @@ import java.awt.*;
 public class View implements ModelObserver {
     private static View view;
     private Model model;
+    private Control control;
     private MainFrame mainFrame;
     private MainPanel mainPanel;
     private StatusBarPanel statusBar;
 
     private View(){
     }
-    public static View getSingleton(Model model){
+    public static View getSingleton() throws IllegalStateException{
         if(view == null){
-            view = new View();
-            view.model = model;
+            throw new IllegalStateException("Initialize the singleton first");
         }
+        return view;
+    }
+
+    public static View initSingleton(Model model, Control control){
+        if(view != null){
+            return view;
+        }
+        view = new View();
+        view.model = model;
+        view.control = control;
         return view;
     }
 
