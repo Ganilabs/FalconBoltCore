@@ -20,7 +20,7 @@
             <!-- Set console appender to INFO and up -->
             <AppenderRef ref="Console" level="INFO"/>
             <!-- Set file appender to ERROR and up -->
-            <AppenderRef ref="RollingFile" level="ERROR"/>
+            <AppenderRef ref="RollingFile" level="INFO"/>
         </Root>
     </Loggers>
 </Configuration>

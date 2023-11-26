@@ -1,16 +1,25 @@
 package com.ganilabs.falconbolt.core.Model;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.ganilabs.falconbolt.core.Constant;
+import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
+import com.ganilabs.falconbolt.core.config.HibernateHelper;
+import com.ganilabs.falconbolt.core.config.SpringContextProvider;
 
 public class Model {
     private static final Logger LOGGER = LogManager.getLogger(Model.class);
     private final Set<ModelObserver> observers= new HashSet<>();
-
     private static Model model;
+    ModelObserver liveView;
     private Model(){};
 
     public static Model getSingleton(){
@@ -19,9 +28,22 @@ public class Model {
             model = new Model();
             return model;
         }
+       
         return model;
     }
-
+    
+    public void init() {
+    	try {
+    		 HibernateHelper.initSessionFactory();
+    	}catch(HibernateException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    	}
+    }
+    
+    public void setLiveView(ModelObserver liveView) {
+    	this.liveView = liveView;
+    }
     public void addModelObserver(ModelObserver observer){
         LOGGER.info("Registering new observer in Core Model");
         this.observers.add(observer);
@@ -37,5 +59,21 @@ public class Model {
         for(ModelObserver observer : this.observers){
             observer.update(changeMsg);
         }
+    }
+    
+    
+    
+    public Optional<PersonRepo> getPersonRepository() {
+    	try {
+    		return Optional.ofNullable((PersonRepo) SpringContextProvider.getRepositoryContext().getBean(PersonRepo.class));
+    	}catch(NoSuchBeanDefinitionException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    		
+    	}catch(BeansException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    	}
+    	return Optional.empty();
     }
 }

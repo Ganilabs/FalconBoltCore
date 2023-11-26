@@ -1,18 +1,24 @@
 package com.ganilabs.falconbolt.core.View;
 
+import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.ganilabs.falconbolt.core.config.HibernateHelper;
 
-
-import javax.swing.*;
-import java.awt.*;
-
-public class View implements ModelObserver {
+public class View implements ModelObserver{
     private static final Logger LOGGER = LogManager.getLogger(View.class);
     private static View view;
     private Model model;
@@ -41,11 +47,11 @@ public class View implements ModelObserver {
     }
 
     public void init(){
-        this.model.addModelObserver(this);
         this.initializeUI();
     }
 
     public void setView (AbstractWorkView view){
+    	model.setLiveView(view);
         this.mainPanel.displayWorkView(view.getViewName());
     }
 
@@ -66,13 +72,10 @@ public class View implements ModelObserver {
             System.exit(1);
         }
     }
-
+    
     @Override
-    public void update(String changeMessage) {
-       switch (changeMessage){
-           case Constant.ModelChangeMessages.NEW_PLUGIN_FOUND:
-               System.out.println("new plugon discovered in model");
-       }
+    public void update(String msg) {
+    	
     }
 
     private void initializeUI(){
@@ -88,6 +91,12 @@ public class View implements ModelObserver {
             mainFrame.setTitle(Constant.APP_TITLE);
             mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             mainFrame.setSize(400 , 400);
+            mainFrame.addWindowListener(new WindowAdapter() {
+            	@Override
+            	public void windowClosing(WindowEvent e) {
+            		HibernateHelper.closeSessionFactory();
+            	}
+            });
         } catch (Exception e){
             LOGGER.fatal(e.getMessage() , e);
             System.exit(1);

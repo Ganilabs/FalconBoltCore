@@ -1,8 +1,13 @@
 package com.ganilabs.falconbolt.core.Control;
 
-import com.ganilabs.falconbolt.core.Model.Model;
+import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.Repository.user.Person;
+import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
 
 public class Control {
     private static Control control;
@@ -28,5 +33,14 @@ public class Control {
 
     public void init(){
         LOGGER.info("Initializing controller");
+    }
+    
+    public void handleClick() {
+    	Optional<PersonRepo> repo = this.model.getPersonRepository();
+    	if(repo.isPresent()) {
+    		Person person = repo.get().getPersonById(1);
+        	System.out.print(person.getName());
+    	}
+    	
     }
 }
