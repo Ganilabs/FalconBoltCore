@@ -52,11 +52,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     
     @Override
     public void update(String msg) {
-    	switch(msg) {
-    	case Constant.ModelChangeMessages.ERROR_ENCOUNTERED:
-    		JOptionPane.showMessageDialog(new JFrame(), "Something went wrong", "Dialog",
-    		        JOptionPane.ERROR_MESSAGE);
-    	}
+    	super.update(msg);
     }
 
 

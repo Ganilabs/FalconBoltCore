@@ -5,9 +5,11 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.Repository.user.Person;
 import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
+import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 
 public class Control {
     private static Control control;
@@ -33,6 +35,17 @@ public class Control {
 
     public void init(){
         LOGGER.info("Initializing controller");
+        
+    }
+    
+    private void loadPlugins() {
+    	Optional<PluginStore> pluginStoreOp = model.getPluginStore();
+    	if(pluginStoreOp.isEmpty()) {
+    		LOGGER.error("Plugins failed to load. Store is null");
+    		model.externalNotifyLiveView(Constant.ErrorMessages.PLUGINS_FAILED_TO_LOAD);
+    	}
+    	PluginStore store= pluginStoreOp.get();
+    	//TODO : Continue from service loader
     }
     
     public void handleClick() {

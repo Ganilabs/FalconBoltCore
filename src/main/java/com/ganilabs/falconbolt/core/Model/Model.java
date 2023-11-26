@@ -12,6 +12,7 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
+import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.config.HibernateHelper;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
 
@@ -37,7 +38,7 @@ public class Model {
     		 HibernateHelper.initSessionFactory();
     	}catch(HibernateException e) {
     		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
     }
     
@@ -61,19 +62,40 @@ public class Model {
         }
     }
     
+    //to be used only from within model class hence private.
+    private void internalNotifyLiveView(String msg) {
+    	this.liveView.update(msg);
+    }
     
+    // to be used by external users like controller
+    public void externalNotifyLiveView(String msg) {
+    	this.liveView.update(msg);
+    }
     
     public Optional<PersonRepo> getPersonRepository() {
     	try {
     		return Optional.ofNullable((PersonRepo) SpringContextProvider.getRepositoryContext().getBean(PersonRepo.class));
     	}catch(NoSuchBeanDefinitionException e) {
     		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    	}catch(BeansException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    	}
+    	return Optional.empty();
+    }
+    
+    public Optional<PluginStore> getPluginStore(){
+    	try {
+    		return Optional.ofNullable((PluginStore)SpringContextProvider.getModelContext().getBean(PluginStore.class));
+    	}catch(NoSuchBeanDefinitionException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     		
     	}catch(BeansException e) {
     		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ModelChangeMessages.ERROR_ENCOUNTERED);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
-    	return Optional.empty();
+    	return Optional.empty();	
     }
 }
