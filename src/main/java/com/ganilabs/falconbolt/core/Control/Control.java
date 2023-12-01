@@ -67,6 +67,7 @@ public class Control {
         	ServiceLoader<PluginAPI> serviceLoader = ServiceLoader.load(PluginAPI.class);
         	for(PluginAPI plugin : serviceLoader) {
         		store.addLoadedPlogin(plugin);
+        		LOGGER.info("Loaded plugin : {} id :{} " , plugin.getPluginName() , plugin.getPluginId());
         	}
     	}catch(ServiceConfigurationError e) {
     		LOGGER.error(e.getMessage(), e);
@@ -84,6 +85,7 @@ public class Control {
     	for(String message : messages) {
     		MessageQueue msgQueue = new MessageQueueImpl(message);
     		this.messageQueues.put(msgQueue.getName(), msgQueue);
+    		LOGGER.info("Loaded MessageQueue : {}" , message);
     	}
     }
     
@@ -107,6 +109,7 @@ public class Control {
 			for(String dispatchedMessage : messagesDispatched) {
 				dispatcher.addMessageQueue(this.messageQueues.get(dispatchedMessage));
 			}
+			LOGGER.info("Setup Listeners and dispatchers for {} plugin. id : {}" , plugin.getValue().getPluginName() , plugin.getValue().getPluginId());
 		}
 	}
     

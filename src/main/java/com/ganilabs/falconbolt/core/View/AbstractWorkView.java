@@ -9,8 +9,7 @@ import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 
 public abstract class AbstractWorkView extends JPanel implements ModelObserver {
-    public abstract String getViewName();
-    public abstract Integer getViewId();
+	public abstract String getViewName();
     Model model;
     protected AbstractWorkView(Model model) {
     	this.model = model;

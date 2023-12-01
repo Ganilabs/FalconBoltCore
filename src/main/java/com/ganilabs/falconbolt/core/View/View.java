@@ -3,6 +3,8 @@ package com.ganilabs.falconbolt.core.View;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -13,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Control.Control;
+import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
@@ -20,11 +23,12 @@ import com.ganilabs.falconbolt.core.config.HibernateHelper;
 
 public class View implements ModelObserver{
     private static final Logger LOGGER = LogManager.getLogger(View.class);
+    private Map<String , AbstractWorkView> loadedViews = new HashMap<String , AbstractWorkView>();
     private static View view;
     private Model model;
     private Control control;
-    private MainFrame mainFrame;
-    private MainPanel mainPanel;
+    private MainFrame mainFrame = new MainFrame();
+    private MainPanel mainPanel = new MainPanel(new BorderLayout());
     private StatusBarPanel statusBar;
 
     private View(){
@@ -47,7 +51,15 @@ public class View implements ModelObserver{
     }
 
     public void init(){
+    	this.loadWorkViews();
         this.initializeUI();
+    }
+    
+    private void loadWorkViews() {
+    	AbstractWorkView welcomeView = new WelcomeWorkView(new WelcomeViewController() , this.model);
+    	this.mainPanel.loadWorkView(welcomeView);
+    	this.loadedViews.put(welcomeView.getViewName(), welcomeView);
+    	System.out.print(this.loadedViews.size());
     }
 
     public void setView (AbstractWorkView view){
@@ -56,7 +68,7 @@ public class View implements ModelObserver{
     }
 
     public void chooseWorkView(){
-        this.setView(new WelcomeWorkView());
+        this.setView(this.loadedViews.get(WelcomeWorkView.VIEW_NAME));
     }
 
     public void startApp(){
@@ -81,10 +93,7 @@ public class View implements ModelObserver{
     private void initializeUI(){
         try{
             LOGGER.info("Initializing the UI");
-            mainFrame = new MainFrame();
-            mainPanel = new MainPanel(new BorderLayout());
             statusBar = new StatusBarPanel();
-            mainPanel.loadWorkView(new WelcomeWorkView());
             mainFrame.setContentPane(new JPanel(new BorderLayout()));
             mainFrame.getContentPane().add(mainPanel , BorderLayout.CENTER);
             mainFrame.getContentPane().add(statusBar , BorderLayout.SOUTH);
@@ -94,7 +103,7 @@ public class View implements ModelObserver{
             mainFrame.addWindowListener(new WindowAdapter() {
             	@Override
             	public void windowClosing(WindowEvent e) {
-            		HibernateHelper.closeSessionFactory();
+            		model.shutDownGracefully();
             	}
             });
         } catch (Exception e){

@@ -38,8 +38,13 @@ public class Model {
     		 HibernateHelper.initSessionFactory();
     	}catch(HibernateException e) {
     		LOGGER.error(e.getMessage() , e);
+    		this.shutDownGracefully();
     		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
+    }
+    
+    public void shutDownGracefully() {
+    	HibernateHelper.closeSessionFactory();
     }
     
     public void setLiveView(ModelObserver liveView) {
