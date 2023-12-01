@@ -10,11 +10,11 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
-import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.config.HibernateHelper;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
+import com.ganilabs.falconbolt.core.constant.Constant;
 
 public class Model {
     private static final Logger LOGGER = LogManager.getLogger(Model.class);

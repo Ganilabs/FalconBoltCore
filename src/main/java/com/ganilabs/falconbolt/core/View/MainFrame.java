@@ -1,8 +1,9 @@
 package com.ganilabs.falconbolt.core.View;
 
-import com.ganilabs.falconbolt.core.Constant;
-
 import javax.swing.*;
+
+import com.ganilabs.falconbolt.core.constant.Constant;
+
 import java.awt.*;
 
 public class MainFrame extends JFrame{

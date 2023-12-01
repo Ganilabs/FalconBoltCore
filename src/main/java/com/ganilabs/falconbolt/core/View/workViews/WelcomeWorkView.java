@@ -2,27 +2,145 @@ package com.ganilabs.falconbolt.core.View.workViews;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
+import com.ganilabs.falconbolt.core.View.View;
+import com.ganilabs.falconbolt.core.constant.Constant;
+import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 
 public class WelcomeWorkView extends AbstractWorkView{
     public final static String VIEW_NAME = "WELCOME_VIEW";
     public final static Integer VIEW_ID = 1;
+    private final static Logger LOGGER = LogManager.getLogger(WelcomeWorkView.class);
     private WelcomeViewController controller;
-    private Model model;
+    private Dimension screenDim = View.screenDim;
     public WelcomeWorkView(WelcomeViewController controller , Model model){
     	super(model);
     	//controller is separated into sub controller for every work view.
     	this.controller = controller;
-        JButton btn = new JButton("Click me");
-        this.add(btn);
-        this.setBackground(Color.BLACK);
-        // Set a preferred size
-        setPreferredSize(new Dimension(300, 200));
+    	try {
+    		SwingUtilities.invokeAndWait(new Runnable() {
+    			@Override
+    			public void run() {
+    				createUI();
+    			}
+    		});
+    	}catch(Exception e) {
+    		this.model.shutDownGracefully();
+    		this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    	}
+    }
+    
+    private void createUI() {
+    	try {
+    		this.setLayout(new GridLayout(0 , 2));
+        	this.setPreferredSize(new Dimension((int)(0.8 * this.screenDim.width) , (int)(0.8 * this.screenDim.height)));
+        	final JPanel recentsPanel = new JPanel();
+        	recentsPanel.setLayout(new BoxLayout(recentsPanel , BoxLayout.Y_AXIS));
+        	final JPanel projectOptionPanel = new JPanel();
+        	this.setupProjectOptionPanel(projectOptionPanel);
+        	this.setupRecentPanel(recentsPanel);
+        	this.add(recentsPanel);
+            this.add(projectOptionPanel);
+    	}catch(IOException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		model.externalNotifyLiveView(Constant.ErrorMessages.RESOURCE_FAILED_TO_LOAD);
+    	}
+    	
+        	
+    }
+    
+    private void setupProjectOptionPanel(JPanel projectOptionPanel) throws IOException{
+    	projectOptionPanel.setLayout(new BoxLayout(projectOptionPanel , BoxLayout.Y_AXIS));
+    	projectOptionPanel.setBackground(new Color(57 , 57 , 57));	
+    	//Setup logo
+    	BufferedImage logo = ImageIO.read(this.getClass().getResource("welcome-logo.png"));
+    	ImageIcon logoIcon = new ImageIcon(logo);
+    	Image scaledLogoImage = logoIcon.getImage().getScaledInstance((int) (screenDim.height * 0.2), -1, Image.SCALE_SMOOTH);
+    	ImageIcon scaledLogoIcon = new ImageIcon(scaledLogoImage);
+    	JLabel labelLogo = new JLabel(scaledLogoIcon);
+    	labelLogo.setAlignmentX(CENTER_ALIGNMENT);
+    	labelLogo.setBorder(new EmptyBorder(20 , 20 , 5 , 20));
+    	//setup Product name
+    	JLabel labelProductName = new JLabel(DisplayTextResources.PRODUCT_NAME);
+    	labelProductName.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 35));
+    	labelProductName.setForeground(Color.white);
+    	JLabel labelProductVersion = new JLabel("V" + DisplayTextResources.VERSION);
+    	labelProductVersion.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
+    	labelProductVersion.setForeground(Color.white);
+    	JPanel bannerLabels = new JPanel(new FlowLayout());
+    	bannerLabels.setBackground(new Color(57 , 57 , 57));
+    	bannerLabels.add(labelProductName);
+    	bannerLabels.add(labelProductVersion);
+    	bannerLabels.setMaximumSize(bannerLabels.getPreferredSize());
+    	bannerLabels.setAlignmentX(CENTER_ALIGNMENT);
+    	
+    	//New Project button
+    	BufferedImage newIconBuff = ImageIO.read(this.getClass().getResource("plus.png"));
+    	ImageIcon newIcon = new ImageIcon(newIconBuff);
+    	Image scaledNewImage = newIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
+    	ImageIcon scaledNewIcon = new ImageIcon(scaledNewImage);
+    	JButton newProjectButton = new JButton("  " + DisplayTextResources.NEW_PROJECT , scaledNewIcon);
+    	newProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
+    	newProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
+    	newProjectButton.setAlignmentX(CENTER_ALIGNMENT);
+    	newProjectButton.setBackground(new Color(57 , 57 , 57));
+    	newProjectButton.setForeground(new Color(255 , 255 ,255));
+    	newProjectButton.setBorder(BorderFactory.createEmptyBorder());
+    	newProjectButton.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
+    	newProjectButton.setMargin(new Insets(20 , 20, 20 , 20));
+    	
+    	//Open project button
+    	BufferedImage openIconBuff = ImageIO.read(this.getClass().getResource("open.png"));
+    	ImageIcon openIcon = new ImageIcon(openIconBuff);
+    	Image scaledOpenImage = openIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
+    	ImageIcon scaledOpenIcon = new ImageIcon(scaledOpenImage);
+    	JButton openProjectButton = new JButton("  " + DisplayTextResources.OPEN_PROJECT , scaledOpenIcon);
+    	openProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
+    	openProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
+    	openProjectButton.setAlignmentX(CENTER_ALIGNMENT);
+    	openProjectButton.setBackground(new Color(57 , 57 , 57));
+    	openProjectButton.setForeground(new Color(255 , 255 ,255));
+    	openProjectButton.setBorder(BorderFactory.createEmptyBorder());
+    	openProjectButton.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
+    	openProjectButton.setMargin(new Insets(20 , 20, 20 , 20));
+    	
+    	
+    	projectOptionPanel.add(labelLogo);  
+    	projectOptionPanel.add(bannerLabels);
+    	projectOptionPanel.add(Box.createVerticalStrut(40));
+    	projectOptionPanel.add(newProjectButton);
+    	projectOptionPanel.add(Box.createVerticalStrut(20));
+    	projectOptionPanel.add(openProjectButton);
+    	
+    }
+    
+    private void setupRecentPanel(JPanel recentPanel) {
+    	recentPanel.setBackground(new Color(45 ,45 , 45));
     }
     
     @Override

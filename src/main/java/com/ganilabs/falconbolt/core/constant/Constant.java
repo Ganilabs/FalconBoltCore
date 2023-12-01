@@ -1,4 +1,4 @@
-package com.ganilabs.falconbolt.core;
+package com.ganilabs.falconbolt.core.constant;
 
 public class Constant {
     public static final String APP_TITLE = "Falcon Bolt";
@@ -9,5 +9,6 @@ public class Constant {
     public static class ErrorMessages{
     	public static final String ERROR_ENCOUNTERED = "errorEncountered";
     	public static final String PLUGINS_FAILED_TO_LOAD = "pluginsFailedToLoad";
+    	public static final String RESOURCE_FAILED_TO_LOAD = "resourceFailedToLoad";
     }
 }

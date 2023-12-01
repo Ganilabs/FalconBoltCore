@@ -14,12 +14,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
-import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.Repository.user.Person;
 import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
+import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.InterProcessMessages;
 import com.ganilabs.falconbolt.interfaces.plugin.MessageQueue;
 import com.ganilabs.falconbolt.interfaces.plugin.PluginAPI;

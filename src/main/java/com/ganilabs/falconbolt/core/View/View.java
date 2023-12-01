@@ -1,11 +1,14 @@
 package com.ganilabs.falconbolt.core.View;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -13,13 +16,12 @@ import javax.swing.WindowConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
-import com.ganilabs.falconbolt.core.config.HibernateHelper;
+import com.ganilabs.falconbolt.core.constant.Constant;
 
 public class View implements ModelObserver{
     private static final Logger LOGGER = LogManager.getLogger(View.class);
@@ -30,6 +32,7 @@ public class View implements ModelObserver{
     private MainFrame mainFrame = new MainFrame();
     private MainPanel mainPanel = new MainPanel(new BorderLayout());
     private StatusBarPanel statusBar;
+    public static final Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
 
     private View(){
     }
@@ -51,6 +54,7 @@ public class View implements ModelObserver{
     }
 
     public void init(){
+//    	this.setLookAndFeel();
     	this.loadWorkViews();
         this.initializeUI();
     }
@@ -61,6 +65,17 @@ public class View implements ModelObserver{
     	this.loadedViews.put(welcomeView.getViewName(), welcomeView);
     	System.out.print(this.loadedViews.size());
     }
+    
+//    private void setLookAndFeel() {
+//    	try {
+//    		BasicLookAndFeel darcula = new DarculaLaf();
+//            UIManager.setLookAndFeel(darcula);
+//    	}catch(Exception e) {
+//    		LOGGER.error(e.getMessage() , e);
+//    		model.shutDownGracefully();
+//    	}
+//    	
+//    }
 
     public void setView (AbstractWorkView view){
     	model.setLiveView(view);
@@ -99,7 +114,8 @@ public class View implements ModelObserver{
             mainFrame.getContentPane().add(statusBar , BorderLayout.SOUTH);
             mainFrame.setTitle(Constant.APP_TITLE);
             mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            mainFrame.setSize(400 , 400);
+//            mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            mainFrame.pack();
             mainFrame.addWindowListener(new WindowAdapter() {
             	@Override
             	public void windowClosing(WindowEvent e) {

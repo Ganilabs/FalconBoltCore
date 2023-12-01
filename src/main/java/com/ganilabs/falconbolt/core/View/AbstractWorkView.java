@@ -4,13 +4,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import com.ganilabs.falconbolt.core.Constant;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
+import com.ganilabs.falconbolt.core.constant.Constant;
 
 public abstract class AbstractWorkView extends JPanel implements ModelObserver {
 	public abstract String getViewName();
-    Model model;
+    protected Model model;
     protected AbstractWorkView(Model model) {
     	this.model = model;
     	model.addModelObserver(this);
