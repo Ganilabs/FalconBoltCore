@@ -3,10 +3,11 @@ package com.ganilabs.falconbolt.core.View.workViews;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -29,14 +30,19 @@ import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
 import com.ganilabs.falconbolt.core.View.View;
+import com.ganilabs.falconbolt.core.View.components.TransparentButton;
+import com.ganilabs.falconbolt.core.View.modals.AbstractModal;
+import com.ganilabs.falconbolt.core.View.modals.NewProjectModal;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
+import com.ganilabs.falconbolt.core.constant.StyleConstants;
 
 public class WelcomeWorkView extends AbstractWorkView{
     public final static String VIEW_NAME = "WELCOME_VIEW";
     public final static Integer VIEW_ID = 1;
     private final static Logger LOGGER = LogManager.getLogger(WelcomeWorkView.class);
     private WelcomeViewController controller;
+    private WelcomeWorkView thisReference = this;
     private Dimension screenDim = View.screenDim;
     public WelcomeWorkView(WelcomeViewController controller , Model model){
     	super(model);
@@ -76,7 +82,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     
     private void setupProjectOptionPanel(JPanel projectOptionPanel) throws IOException{
     	projectOptionPanel.setLayout(new BoxLayout(projectOptionPanel , BoxLayout.Y_AXIS));
-    	projectOptionPanel.setBackground(new Color(57 , 57 , 57));	
+    	projectOptionPanel.setBackground(StyleConstants.BACKGROUND_PRIMARY);	
     	//Setup logo
     	BufferedImage logo = ImageIO.read(this.getClass().getResource("welcome-logo.png"));
     	ImageIcon logoIcon = new ImageIcon(logo);
@@ -87,13 +93,13 @@ public class WelcomeWorkView extends AbstractWorkView{
     	labelLogo.setBorder(new EmptyBorder(20 , 20 , 5 , 20));
     	//setup Product name
     	JLabel labelProductName = new JLabel(DisplayTextResources.PRODUCT_NAME);
-    	labelProductName.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 35));
-    	labelProductName.setForeground(Color.white);
+    	labelProductName.setFont(StyleConstants.HEADING_SUB1);
+    	labelProductName.setForeground(StyleConstants.FOREGROUND_PRIMARY);
     	JLabel labelProductVersion = new JLabel("V" + DisplayTextResources.VERSION);
-    	labelProductVersion.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
+    	labelProductVersion.setFont(StyleConstants.NORMAL_TEXT);
     	labelProductVersion.setForeground(Color.white);
     	JPanel bannerLabels = new JPanel(new FlowLayout());
-    	bannerLabels.setBackground(new Color(57 , 57 , 57));
+    	bannerLabels.setBackground(StyleConstants.BACKGROUND_PRIMARY);
     	bannerLabels.add(labelProductName);
     	bannerLabels.add(labelProductVersion);
     	bannerLabels.setMaximumSize(bannerLabels.getPreferredSize());
@@ -104,29 +110,29 @@ public class WelcomeWorkView extends AbstractWorkView{
     	ImageIcon newIcon = new ImageIcon(newIconBuff);
     	Image scaledNewImage = newIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
     	ImageIcon scaledNewIcon = new ImageIcon(scaledNewImage);
-    	JButton newProjectButton = new JButton("  " + DisplayTextResources.NEW_PROJECT , scaledNewIcon);
+    	JButton newProjectButton = new TransparentButton("  " + DisplayTextResources.NEW_PROJECT , scaledNewIcon);
     	newProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
     	newProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
     	newProjectButton.setAlignmentX(CENTER_ALIGNMENT);
-    	newProjectButton.setBackground(new Color(57 , 57 , 57));
-    	newProjectButton.setForeground(new Color(255 , 255 ,255));
-    	newProjectButton.setBorder(BorderFactory.createEmptyBorder());
-    	newProjectButton.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
     	newProjectButton.setMargin(new Insets(20 , 20, 20 , 20));
+    	
+    	newProjectButton.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent event) {
+    			AbstractModal newProject = new NewProjectModal(thisReference);
+    			newProject.init();
+    		}
+    	});
     	
     	//Open project button
     	BufferedImage openIconBuff = ImageIO.read(this.getClass().getResource("open.png"));
     	ImageIcon openIcon = new ImageIcon(openIconBuff);
     	Image scaledOpenImage = openIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
     	ImageIcon scaledOpenIcon = new ImageIcon(scaledOpenImage);
-    	JButton openProjectButton = new JButton("  " + DisplayTextResources.OPEN_PROJECT , scaledOpenIcon);
+    	JButton openProjectButton = new TransparentButton("  " + DisplayTextResources.OPEN_PROJECT , scaledOpenIcon);
     	openProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
     	openProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
     	openProjectButton.setAlignmentX(CENTER_ALIGNMENT);
-    	openProjectButton.setBackground(new Color(57 , 57 , 57));
-    	openProjectButton.setForeground(new Color(255 , 255 ,255));
-    	openProjectButton.setBorder(BorderFactory.createEmptyBorder());
-    	openProjectButton.setFont(new Font(Font.SANS_SERIF , Font.PLAIN , 20));
     	openProjectButton.setMargin(new Insets(20 , 20, 20 , 20));
     	
     	
@@ -140,7 +146,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     }
     
     private void setupRecentPanel(JPanel recentPanel) {
-    	recentPanel.setBackground(new Color(45 ,45 , 45));
+    	recentPanel.setBackground(StyleConstants.BACKGROUND_SECONDARY);
     }
     
     @Override
@@ -151,6 +157,11 @@ public class WelcomeWorkView extends AbstractWorkView{
     @Override
     public void update(String msg) {
     	super.update(msg);
+    }
+    
+    @Override
+    public void captureEventFromChildSubFrame() {
+    	
     }
 
 

@@ -109,12 +109,10 @@ public class View implements ModelObserver{
         try{
             LOGGER.info("Initializing the UI");
             statusBar = new StatusBarPanel();
+            mainFrame.init();
             mainFrame.setContentPane(new JPanel(new BorderLayout()));
             mainFrame.getContentPane().add(mainPanel , BorderLayout.CENTER);
             mainFrame.getContentPane().add(statusBar , BorderLayout.SOUTH);
-            mainFrame.setTitle(Constant.APP_TITLE);
-            mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//            mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             mainFrame.pack();
             mainFrame.addWindowListener(new WindowAdapter() {
             	@Override

@@ -12,5 +12,6 @@ public class MainFrame extends JFrame{
         setTitle(Constant.APP_TITLE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         //Init Content pane
+        
     }
 }

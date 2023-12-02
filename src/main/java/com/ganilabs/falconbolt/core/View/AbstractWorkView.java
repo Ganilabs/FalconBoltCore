@@ -10,6 +10,7 @@ import com.ganilabs.falconbolt.core.constant.Constant;
 
 public abstract class AbstractWorkView extends JPanel implements ModelObserver {
 	public abstract String getViewName();
+	public abstract void captureEventFromChildSubFrame();
     protected Model model;
     protected AbstractWorkView(Model model) {
     	this.model = model;
