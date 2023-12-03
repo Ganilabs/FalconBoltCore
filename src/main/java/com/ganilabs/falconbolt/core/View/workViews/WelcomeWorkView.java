@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -30,6 +29,7 @@ import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
 import com.ganilabs.falconbolt.core.View.View;
+import com.ganilabs.falconbolt.core.View.ViewMessage;
 import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.View.modals.AbstractModal;
 import com.ganilabs.falconbolt.core.View.modals.NewProjectModal;
@@ -159,10 +159,13 @@ public class WelcomeWorkView extends AbstractWorkView{
     	super.update(msg);
     }
     
+    //used to receive data from dialogs.
     @Override
-    public void captureEventFromChildSubFrame() {
-    	
+    public void captureEventFromChildSubFrame(ViewMessage msg) {
+    	switch(msg.getMsgType()) {
+    	case Constant.ViewMessages.NEW_PROJECT_NAME:
+    		LOGGER.info("Creating new project {} " , msg.getMsgData());
+    		controller.createNewProject((String)msg.getMsgData());
+    	}
     }
-
-
 }

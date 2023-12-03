@@ -10,7 +10,7 @@ import com.ganilabs.falconbolt.core.constant.Constant;
 
 public abstract class AbstractWorkView extends JPanel implements ModelObserver {
 	public abstract String getViewName();
-	public abstract void captureEventFromChildSubFrame();
+	public abstract void captureEventFromChildSubFrame(ViewMessage message);
     protected Model model;
     protected AbstractWorkView(Model model) {
     	this.model = model;
@@ -23,9 +23,25 @@ public abstract class AbstractWorkView extends JPanel implements ModelObserver {
     	case Constant.ErrorMessages.ERROR_ENCOUNTERED:
     		JOptionPane.showMessageDialog(new JFrame(), "Something went wrong", "Dialog",
     		        JOptionPane.ERROR_MESSAGE);
+    		break;
     	case Constant.ErrorMessages.PLUGINS_FAILED_TO_LOAD:
     		JOptionPane.showMessageDialog(new JFrame(), "Plugins failed to load", "Dialog",
     		        JOptionPane.ERROR_MESSAGE);
+    		break;
+    	
+    	}
+    }
+    
+    @Override
+	public void update(String changeMsg , String displayData) {
+    	switch(changeMsg) {
+    	case Constant.ViewMessages.OPERATION_SUCCESS:
+    		JOptionPane.showMessageDialog(new JFrame(), displayData, "Dialog",
+    		        JOptionPane.INFORMATION_MESSAGE);
+    	case Constant.ErrorMessages.CUSTOM_ERROR_MESSAGE:
+    		JOptionPane.showMessageDialog(new JFrame(), displayData, "Dialog",
+    		        JOptionPane.ERROR_MESSAGE);
+    		break;
     	}
     }
 

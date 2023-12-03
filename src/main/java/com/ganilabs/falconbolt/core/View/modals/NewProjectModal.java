@@ -2,23 +2,33 @@ package com.ganilabs.falconbolt.core.View.modals;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
+import com.ganilabs.falconbolt.core.View.ViewMessage;
 import com.ganilabs.falconbolt.core.View.components.NormalButton;
 import com.ganilabs.falconbolt.core.View.components.NormalTextField;
+import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 
 public class NewProjectModal extends AbstractModal{
+	AbstractWorkView parentView;
 	public NewProjectModal(AbstractWorkView parentView) {
 		super(parentView , DisplayTextResources.NEW_PROJECT);
+		this.parentView = parentView;
 	}
 
 	@Override
@@ -62,8 +72,31 @@ public class NewProjectModal extends AbstractModal{
 		leftBorder.setSize(200 , 600);
 		leftBorder.setBackground(StyleConstants.BACKGROUND_PRIMARY);
 		mainPanel.add(leftBorder , BorderLayout.WEST);
+		
+		submitButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				String projectName = sessionNameTB.getText();
+				if(!isNameValidFormat(projectName)) {
+					JOptionPane.showMessageDialog(new JFrame(), "Invalid Input : Should contain no specials chars and must start with an alphabet", "Dialog",
+		    		        JOptionPane.ERROR_MESSAGE);
+				}else {
+					 parentView.captureEventFromChildSubFrame(new ViewMessage(Constant.ViewMessages.NEW_PROJECT_NAME , projectName));
+				}
+			}
+		});
 		this.setContentPane(mainPanel);
 		this.setSize(600 , 600);
 		this.setVisible(true);
+		
+	}
+	private Boolean isNameValidFormat(String name) {
+		if(name.length() == 0) return false;
+		//contains no specials chars and starts with alphabet
+		Pattern pattern = Pattern.compile("^[a-z]+[0-9]*[a-z]*$" , Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(name);
+		if(!matcher.find()) return false;
+		return true;
+		
 	}
 }

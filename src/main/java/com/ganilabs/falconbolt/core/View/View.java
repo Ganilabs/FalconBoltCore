@@ -23,7 +23,7 @@ import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
 import com.ganilabs.falconbolt.core.constant.Constant;
 
-public class View implements ModelObserver{
+public class View{
     private static final Logger LOGGER = LogManager.getLogger(View.class);
     private Map<String , AbstractWorkView> loadedViews = new HashMap<String , AbstractWorkView>();
     private static View view;
@@ -98,11 +98,6 @@ public class View implements ModelObserver{
             LOGGER.fatal(e.getMessage() , e);
             System.exit(1);
         }
-    }
-    
-    @Override
-    public void update(String msg) {
-    	
     }
 
     private void initializeUI(){

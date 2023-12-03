@@ -2,7 +2,8 @@ package com.ganilabs.falconbolt.core.View.components;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
+import javax.swing.text.Caret;
+import javax.swing.text.DefaultCaret;
 
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 

@@ -15,8 +15,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.ganilabs.falconbolt.core.Model.Model;
-import com.ganilabs.falconbolt.core.Model.Repository.user.Person;
-import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
 import com.ganilabs.falconbolt.core.constant.Constant;
@@ -124,15 +122,6 @@ public class Control {
     		this.model.externalNotifyLiveView(Constant.ErrorMessages.PLUGINS_FAILED_TO_LOAD);
     	}
     	return Optional.empty();
-    	
-    }
-    
-    public void handleClick() {
-    	Optional<PersonRepo> repo = this.model.getPersonRepository();
-    	if(repo.isPresent()) {
-    		Person person = repo.get().getPersonById(1);
-        	System.out.print(person.getName());
-    	}
     	
     }
 }

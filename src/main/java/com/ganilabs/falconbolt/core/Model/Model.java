@@ -10,8 +10,8 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
-import com.ganilabs.falconbolt.core.Model.Repository.user.PersonRepo;
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
+import com.ganilabs.falconbolt.core.Model.repository.project.ProjectRepository;
 import com.ganilabs.falconbolt.core.config.HibernateHelper;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
 import com.ganilabs.falconbolt.core.constant.Constant;
@@ -71,24 +71,33 @@ public class Model {
     private void internalNotifyLiveView(String msg) {
     	this.liveView.update(msg);
     }
+    private void internalNotifyLiveView(String msg , String data) {
+    	this.liveView.update(msg, data);
+    }
     
     // to be used by external users like controller
     public void externalNotifyLiveView(String msg) {
     	this.liveView.update(msg);
     }
     
-    public Optional<PersonRepo> getPersonRepository() {
+    public void externalNotifyLiveView(String msg ,String data) {
+    	this.liveView.update(msg ,data);
+    }
+    
+    public Optional<ProjectRepository> getProjectRepository(){
     	try {
-    		return Optional.ofNullable((PersonRepo) SpringContextProvider.getRepositoryContext().getBean(PersonRepo.class));
+    		return Optional.ofNullable((ProjectRepository) SpringContextProvider.getRepositoryContext().getBean(ProjectRepository.class));
     	}catch(NoSuchBeanDefinitionException e) {
     		LOGGER.error(e.getMessage() , e);
-    		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    		
     	}catch(BeansException e) {
     		LOGGER.error(e.getMessage() , e);
-    		this.internalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
     	return Optional.empty();
     }
+    
     
     public Optional<PluginStore> getPluginStore(){
     	try {
