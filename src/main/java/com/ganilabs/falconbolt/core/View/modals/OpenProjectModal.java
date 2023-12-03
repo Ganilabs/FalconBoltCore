@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +23,7 @@ import javax.swing.SwingUtilities;
 
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
+import com.ganilabs.falconbolt.core.View.ViewMessage;
 import com.ganilabs.falconbolt.core.View.components.Card;
 import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.constant.Constant;
@@ -88,6 +91,13 @@ public class OpenProjectModal extends AbstractModal{
 		JButton projectButton = new TransparentButton( project.getProjectName(),scaledLightningIcon , StyleConstants.BACKGROUND_SECONDARY);
 		projectButton.setPreferredSize(new Dimension(350 , projectButton.getPreferredSize().height));
 		projectButton.setHorizontalAlignment(SwingConstants.LEFT);
+		projectButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				parentView.captureEventFromChildSubFrame(new ViewMessage(Constant.ViewMessages.OPEN_SELECTED_PROJECT , project.getProjectId()));
+			}
+		});
 		cardContent.add(projectButton);
 //		cardContent.add(Box.createHorizontalStrut(250));
 		JLabel createdOn = new JLabel("Created On : " + project.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));

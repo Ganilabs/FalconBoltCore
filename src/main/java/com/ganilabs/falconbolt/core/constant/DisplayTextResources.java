@@ -7,4 +7,5 @@ public class DisplayTextResources {
 	public final static String OPEN_PROJECT = "Open Project";
 	public final static String NEW_SESSION_NAME = "Session name : ";
 	public final static String CREATE_TEXT = "Create";
+	public final static String RECENT_PROJECTS = "Recent : ";
 }

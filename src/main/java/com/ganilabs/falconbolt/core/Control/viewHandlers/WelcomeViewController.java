@@ -1,8 +1,10 @@
 package com.ganilabs.falconbolt.core.Control.viewHandlers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +44,23 @@ public class WelcomeViewController {
 			if(repoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
 			ProjectRepository repo = repoOp.get();
 			return repo.getAllProjects();
+		}catch(NoSuchElementException e) {
+			LOGGER.error(e.getMessage() , e);
+			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+		}
+		return List.of();
+	}
+	
+	public List<ProjectDTO> getAllProjectsSortedByOpeningTime(Integer numRecords){
+		try {
+			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
+			if(repoOp.isEmpty()) throw new NoSuchElementException("Project Repository not found");
+			ProjectRepository repo = repoOp.get();
+			List<ProjectDTO> receivedProjects= repo.getAllProjects();
+			Collections.sort(receivedProjects , ProjectDTO.COMPARE_BY_OPENEDTIME);
+			Collections.reverse(receivedProjects);
+			return receivedProjects.stream().limit(numRecords).collect(Collectors.toList());
+			
 		}catch(NoSuchElementException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);

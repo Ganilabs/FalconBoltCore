@@ -10,9 +10,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -32,6 +36,7 @@ import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
 import com.ganilabs.falconbolt.core.View.View;
 import com.ganilabs.falconbolt.core.View.ViewMessage;
+import com.ganilabs.falconbolt.core.View.components.Card;
 import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.View.modals.AbstractModal;
 import com.ganilabs.falconbolt.core.View.modals.NewProjectModal;
@@ -47,6 +52,8 @@ public class WelcomeWorkView extends AbstractWorkView{
     private WelcomeViewController controller;
     private WelcomeWorkView thisReference = this;
     private Dimension screenDim = View.screenDim;
+    
+    
     public WelcomeWorkView(WelcomeViewController controller , Model model){
     	super(model);
     	//controller is separated into sub controller for every work view.
@@ -64,7 +71,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     	}
     }
     
-    private void createUI() {
+    private void createUI(){
     	try {
     		this.setLayout(new GridLayout(0 , 2));
         	this.setPreferredSize(new Dimension((int)(0.8 * this.screenDim.width) , (int)(0.8 * this.screenDim.height)));
@@ -72,7 +79,21 @@ public class WelcomeWorkView extends AbstractWorkView{
         	recentsPanel.setLayout(new BoxLayout(recentsPanel , BoxLayout.Y_AXIS));
         	final JPanel projectOptionPanel = new JPanel();
         	this.setupProjectOptionPanel(projectOptionPanel);
-        	this.setupRecentPanel(recentsPanel);
+        	
+        	SwingUtilities.invokeLater(new Runnable(){
+    			@Override
+    			public void run() {
+    				try {
+    					List<ProjectDTO> recentProjectsList = controller.getAllProjectsSortedByOpeningTime(15);
+        				setupRecentPanel(recentsPanel , recentProjectsList);
+    				}catch(IOException e) {
+    					LOGGER.error("Failed to load RecentProjectPanel" , e);
+    					model.externalNotifyLiveView(Constant.ErrorMessages.RESOURCE_FAILED_TO_LOAD);
+    				}
+    				
+    			}
+    		});
+        	
         	this.add(recentsPanel);
             this.add(projectOptionPanel);
     	}catch(IOException e) {
@@ -160,8 +181,21 @@ public class WelcomeWorkView extends AbstractWorkView{
     	
     }
     
-    private void setupRecentPanel(JPanel recentPanel) {
+    private void setupRecentPanel(JPanel recentPanel , List<ProjectDTO> projects) throws IOException {
     	recentPanel.setBackground(StyleConstants.BACKGROUND_SECONDARY);
+    	JLabel heading = new JLabel(DisplayTextResources.RECENT_PROJECTS);
+    	heading.setFont(StyleConstants.HEADING_SUB2);
+    	heading.setForeground(StyleConstants.FOREGROUND_TERTIARY);
+    	heading.setBorder(BorderFactory.createEmptyBorder(0 , 20 , 0 , 20));
+    	recentPanel.add(Box.createVerticalStrut(20));
+    	recentPanel.add(heading);
+    	recentPanel.add(Box.createVerticalStrut(20));
+    	
+    	//Projects displayed
+    	for(ProjectDTO project : projects) {
+			recentPanel.add(createCardForProject(project));
+			recentPanel.add(Box.createVerticalStrut(7));
+		}
     }
     
     @Override
@@ -181,6 +215,37 @@ public class WelcomeWorkView extends AbstractWorkView{
     	case Constant.ViewMessages.NEW_PROJECT_NAME:
     		LOGGER.info("Creating new project {} " , msg.getMsgData());
     		controller.createNewProject((String)msg.getMsgData());
+    		break;
+    	case Constant.ViewMessages.OPEN_SELECTED_PROJECT:
+    		LOGGER.info("Opening project {}" , msg.getMsgData());
+    		
+    		break;
     	}
+    	
+    		
     }
+    
+    private Card createCardForProject(ProjectDTO project) throws IOException {
+		JPanel cardContent = new JPanel(new FlowLayout());
+		cardContent.setBackground(StyleConstants.BACKGROUND_SECONDARY);
+		BufferedImage lightningIconBuff = ImageIO.read(this.getClass().getResource("lightning.png"));
+    	ImageIcon lightningIcon = new ImageIcon(lightningIconBuff);
+    	Image scaledLightningImage = lightningIcon.getImage().getScaledInstance(20 , -1, Image.SCALE_SMOOTH);
+    	ImageIcon scaledLightningIcon = new ImageIcon(scaledLightningImage);
+		JButton projectButton = new TransparentButton( project.getProjectName(),scaledLightningIcon , StyleConstants.BACKGROUND_SECONDARY);
+		projectButton.setPreferredSize(new Dimension(350 , projectButton.getPreferredSize().height));
+		projectButton.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		cardContent.add(projectButton);
+//		cardContent.add(Box.createHorizontalStrut(250));
+		JLabel createdOn = new JLabel("Created On : " + project.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+		createdOn.setFont(StyleConstants.NORMAL_TEXT);
+		createdOn.setForeground(StyleConstants.FOREGROUND_SECONDARY);
+		cardContent.add(createdOn);
+		cardContent.setMaximumSize(createdOn.getSize());
+		Card card = new Card(cardContent);
+		card.setMaximumSize(new Dimension(550 , card.getPreferredSize().height));
+		card.setAlignmentX(LEFT_ALIGNMENT);
+		return card;
+	}
 }
