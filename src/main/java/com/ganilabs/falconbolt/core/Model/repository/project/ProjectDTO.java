@@ -1,8 +1,12 @@
 package com.ganilabs.falconbolt.core.Model.repository.project;
 
+import java.time.LocalDateTime;
+
 public class ProjectDTO {
 	private String projectName;
 	private Integer projectId;
+	private LocalDateTime createdAt;
+	private LocalDateTime openedAt;
 	public String getProjectName() {
 		return projectName;
 	}
@@ -14,6 +18,27 @@ public class ProjectDTO {
 	}
 	public void setProjectId(Integer projectId) {
 		this.projectId = projectId;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+	public LocalDateTime getOpenedAt() {
+		return openedAt;
+	}
+	public void setOpenedAt(LocalDateTime openedAt) {
+		this.openedAt = openedAt;
+	}
+	
+	public static ProjectDTO fromEntity(Project project) {
+		ProjectDTO projectDTO = new ProjectDTO();
+		projectDTO.setProjectName(project.getName());
+		projectDTO.setProjectId(project.getProject_id());
+		projectDTO.setCreatedAt(project.getCreatedAt().toLocalDateTime());
+		projectDTO.setOpenedAt(project.openedAt.toLocalDateTime());
+		return projectDTO;
 	}
 	
 }

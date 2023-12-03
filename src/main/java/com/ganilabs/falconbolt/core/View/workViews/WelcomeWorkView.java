@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.Box;
@@ -27,12 +28,14 @@ import org.apache.logging.log4j.Logger;
 
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
 import com.ganilabs.falconbolt.core.View.View;
 import com.ganilabs.falconbolt.core.View.ViewMessage;
 import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.View.modals.AbstractModal;
 import com.ganilabs.falconbolt.core.View.modals.NewProjectModal;
+import com.ganilabs.falconbolt.core.View.modals.OpenProjectModal;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
@@ -110,7 +113,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     	ImageIcon newIcon = new ImageIcon(newIconBuff);
     	Image scaledNewImage = newIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
     	ImageIcon scaledNewIcon = new ImageIcon(scaledNewImage);
-    	JButton newProjectButton = new TransparentButton("  " + DisplayTextResources.NEW_PROJECT , scaledNewIcon);
+    	JButton newProjectButton = new TransparentButton("  " + DisplayTextResources.NEW_PROJECT , scaledNewIcon , StyleConstants.BACKGROUND_PRIMARY);
     	newProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
     	newProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
     	newProjectButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -129,12 +132,24 @@ public class WelcomeWorkView extends AbstractWorkView{
     	ImageIcon openIcon = new ImageIcon(openIconBuff);
     	Image scaledOpenImage = openIcon.getImage().getScaledInstance((int) (screenDim.height * 0.035), -1, Image.SCALE_SMOOTH);
     	ImageIcon scaledOpenIcon = new ImageIcon(scaledOpenImage);
-    	JButton openProjectButton = new TransparentButton("  " + DisplayTextResources.OPEN_PROJECT , scaledOpenIcon);
+    	JButton openProjectButton = new TransparentButton("  " + DisplayTextResources.OPEN_PROJECT , scaledOpenIcon , StyleConstants.BACKGROUND_PRIMARY);
     	openProjectButton.setHorizontalTextPosition(SwingConstants.RIGHT);
     	openProjectButton.setVerticalTextPosition(SwingConstants.CENTER);
     	openProjectButton.setAlignmentX(CENTER_ALIGNMENT);
     	openProjectButton.setMargin(new Insets(20 , 20, 20 , 20));
-    	
+    	openProjectButton.addActionListener(new ActionListener() {
+    		@Override
+    		public void actionPerformed(ActionEvent e) {
+    			SwingUtilities.invokeLater(new Runnable() {
+    				@Override
+    				public void run() {
+    					List<ProjectDTO> projectList = controller.getAllProjects();
+    					AbstractModal openProject = new OpenProjectModal(thisReference , DisplayTextResources.OPEN_PROJECT , projectList);
+    	    			openProject.init();
+    				}
+    			});
+    		}
+    	});
     	
     	projectOptionPanel.add(labelLogo);  
     	projectOptionPanel.add(bannerLabels);

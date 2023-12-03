@@ -28,7 +28,10 @@ public abstract class AbstractWorkView extends JPanel implements ModelObserver {
     		JOptionPane.showMessageDialog(new JFrame(), "Plugins failed to load", "Dialog",
     		        JOptionPane.ERROR_MESSAGE);
     		break;
-    	
+    	case Constant.ErrorMessages.RESOURCE_FAILED_TO_LOAD:
+    		JOptionPane.showMessageDialog(new JFrame(), "Resource Failed To Load", "Dialog",
+    		        JOptionPane.WARNING_MESSAGE);
+    		break;
     	}
     }
     

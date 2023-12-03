@@ -1,5 +1,7 @@
 package com.ganilabs.falconbolt.core.Model.repository.project;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -21,9 +23,26 @@ public class ProjectRepoImpl implements ProjectRepository {
 	}
 
 	@Override
-	public Project getProjectByName(String name) {
+	public ProjectDTO getProjectByName(String name) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public List<ProjectDTO> getAllProjects(){
+		List<ProjectDTO> projectDTOs = new ArrayList<>();
+		String hql = "SELECT P.id , P.name,P.createdAt FROM Project P";
+		Session session = sf.openSession();
+		List<Object[]> returnedProjects = session.createQuery(hql).list();
+		for(Object[]  row: returnedProjects) {
+			Project project = new Project();
+			project.setName((String)row[1]);
+			project.setProject_id((Integer)row[0]);
+			project.setCreatedAt((Timestamp)row[2]);
+			projectDTOs.add(ProjectDTO.fromEntity(project));
+		}
+		session.close();
+		return projectDTOs;
 	}
 	
 	private Boolean projectWithNameExists(String name , Session hibernateSession) {

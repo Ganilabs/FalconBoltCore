@@ -1,5 +1,6 @@
 package com.ganilabs.falconbolt.core.Control.viewHandlers;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -33,5 +34,18 @@ public class WelcomeViewController {
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.CUSTOM_ERROR_MESSAGE , e.getMessage());
 		}
 		
+	}
+	
+	public List<ProjectDTO> getAllProjects() {
+		try {
+			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
+			if(repoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
+			ProjectRepository repo = repoOp.get();
+			return repo.getAllProjects();
+		}catch(NoSuchElementException e) {
+			LOGGER.error(e.getMessage() , e);
+			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+		}
+		return List.of();
 	}
 }
