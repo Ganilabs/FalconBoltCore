@@ -8,11 +8,11 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -21,7 +21,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -41,6 +43,7 @@ import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.View.modals.AbstractModal;
 import com.ganilabs.falconbolt.core.View.modals.NewProjectModal;
 import com.ganilabs.falconbolt.core.View.modals.OpenProjectModal;
+import com.ganilabs.falconbolt.core.View.modals.ProjectPopUpMenu;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
@@ -52,7 +55,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     private WelcomeViewController controller;
     private WelcomeWorkView thisReference = this;
     private Dimension screenDim = View.screenDim;
-    
+    private JPanel recentsPanel;
     
     public WelcomeWorkView(WelcomeViewController controller , Model model){
     	super(model);
@@ -75,7 +78,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     	try {
     		this.setLayout(new GridLayout(0 , 2));
         	this.setPreferredSize(new Dimension((int)(0.8 * this.screenDim.width) , (int)(0.8 * this.screenDim.height)));
-        	final JPanel recentsPanel = new JPanel();
+        	recentsPanel = new JPanel();
         	recentsPanel.setLayout(new BoxLayout(recentsPanel , BoxLayout.Y_AXIS));
         	final JPanel projectOptionPanel = new JPanel();
         	this.setupProjectOptionPanel(projectOptionPanel);
@@ -84,8 +87,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     			@Override
     			public void run() {
     				try {
-    					List<ProjectDTO> recentProjectsList = controller.getAllProjectsSortedByOpeningTime(15);
-        				setupRecentPanel(recentsPanel , recentProjectsList);
+        				setupRecentPanel();
     				}catch(IOException e) {
     					LOGGER.error("Failed to load RecentProjectPanel" , e);
     					model.externalNotifyLiveView(Constant.ErrorMessages.RESOURCE_FAILED_TO_LOAD);
@@ -181,20 +183,22 @@ public class WelcomeWorkView extends AbstractWorkView{
     	
     }
     
-    private void setupRecentPanel(JPanel recentPanel , List<ProjectDTO> projects) throws IOException {
-    	recentPanel.setBackground(StyleConstants.BACKGROUND_SECONDARY);
+    private void setupRecentPanel() throws IOException {
+    	List<ProjectDTO> recentProjectsList = controller.getAllProjectsSortedByOpeningTime(15);
+    	System.out.print("IN RECENTS PANEL ");
+    	recentsPanel.setBackground(StyleConstants.BACKGROUND_SECONDARY);
     	JLabel heading = new JLabel(DisplayTextResources.RECENT_PROJECTS);
     	heading.setFont(StyleConstants.HEADING_SUB2);
     	heading.setForeground(StyleConstants.FOREGROUND_TERTIARY);
     	heading.setBorder(BorderFactory.createEmptyBorder(0 , 20 , 0 , 20));
-    	recentPanel.add(Box.createVerticalStrut(20));
-    	recentPanel.add(heading);
-    	recentPanel.add(Box.createVerticalStrut(20));
+    	recentsPanel.add(Box.createVerticalStrut(20));
+    	recentsPanel.add(heading);
+    	recentsPanel.add(Box.createVerticalStrut(20));
     	
     	//Projects displayed
-    	for(ProjectDTO project : projects) {
-			recentPanel.add(createCardForProject(project));
-			recentPanel.add(Box.createVerticalStrut(7));
+    	for(ProjectDTO project : recentProjectsList) {
+			recentsPanel.add(createCardForProject(project));
+			recentsPanel.add(Box.createVerticalStrut(7));
 		}
     }
     
@@ -206,9 +210,27 @@ public class WelcomeWorkView extends AbstractWorkView{
     @Override
     public void update(String msg) {
     	super.update(msg);
+    	switch(msg) {
+    	case Constant.ModelChangeMessages.PROJECT_CRUD:
+    		SwingUtilities.invokeLater(new Runnable() {
+    			@Override
+    			public void run() {
+    				recentsPanel.removeAll();
+    				try {
+    					recentsPanel.revalidate();
+						setupRecentPanel();
+						recentsPanel.repaint();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+    			}
+    		});
+    		
+    	}
     }
     
-    //used to receive data from dialogs.
+    //used to receive data from dialogs and popup menus.
     @Override
     public void captureEventFromChildSubFrame(ViewMessage msg) {
     	switch(msg.getMsgType()) {
@@ -218,7 +240,12 @@ public class WelcomeWorkView extends AbstractWorkView{
     		break;
     	case Constant.ViewMessages.OPEN_SELECTED_PROJECT:
     		LOGGER.info("Opening project {}" , msg.getMsgData());
-    		
+    		break;
+    	case Constant.ViewMessages.DELETE_SELECTED_PROJECT:
+    		LOGGER.info("Deleting project {}" , msg.getMsgData());
+    		controller.deleteProjectByProjectId((Integer)msg.getMsgData());
+    		JOptionPane.showMessageDialog(new JFrame(), "Deleted Project", "Dialog",
+    		        JOptionPane.INFORMATION_MESSAGE);
     		break;
     	}
     	
@@ -235,16 +262,27 @@ public class WelcomeWorkView extends AbstractWorkView{
 		JButton projectButton = new TransparentButton( project.getProjectName(),scaledLightningIcon , StyleConstants.BACKGROUND_SECONDARY);
 		projectButton.setPreferredSize(new Dimension(350 , projectButton.getPreferredSize().height));
 		projectButton.setHorizontalAlignment(SwingConstants.LEFT);
-		
+		projectButton.setBorder(BorderFactory.createEmptyBorder(0 , 10 , 0 , 10));
+		projectButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					System.out.print("Clicked open");
+				}else {
+					ProjectPopUpMenu popUp = new ProjectPopUpMenu(project.getProjectId() , thisReference);
+					popUp.show(e.getComponent() , e.getX() , e.getY());
+				}
+			}
+		});
 		cardContent.add(projectButton);
 //		cardContent.add(Box.createHorizontalStrut(250));
-		JLabel createdOn = new JLabel("Created On : " + project.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+		JLabel createdOn = new JLabel("Opened On : " + project.getOpenedAt().format(DateTimeFormatter.ofPattern("yy-MM-dd HH:mm")));
 		createdOn.setFont(StyleConstants.NORMAL_TEXT);
 		createdOn.setForeground(StyleConstants.FOREGROUND_SECONDARY);
 		cardContent.add(createdOn);
 		cardContent.setMaximumSize(createdOn.getSize());
 		Card card = new Card(cardContent);
-		card.setMaximumSize(new Dimension(550 , card.getPreferredSize().height));
+		card.setMaximumSize(new Dimension((int)(screenDim.width * 0.45) , card.getPreferredSize().height));
 		card.setAlignmentX(LEFT_ALIGNMENT);
 		return card;
 	}

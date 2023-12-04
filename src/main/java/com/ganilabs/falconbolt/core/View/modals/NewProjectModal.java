@@ -52,7 +52,7 @@ public class NewProjectModal extends AbstractModal{
 		heading.setFont(StyleConstants.HEADING_SUB1);
 		heading.setForeground(StyleConstants.FOREGROUND_PRIMARY);
 		//session name
-		JLabel sessionNameLabel = new JLabel(DisplayTextResources.NEW_SESSION_NAME);
+		JLabel sessionNameLabel = new JLabel(DisplayTextResources.NEW_PROJECT_NAME);
 		sessionNameLabel.setFont(StyleConstants.NORMAL_TEXT);
 		sessionNameLabel.setForeground(StyleConstants.FOREGROUND_PRIMARY);
 		JTextField sessionNameTB = new NormalTextField();
@@ -81,6 +81,7 @@ public class NewProjectModal extends AbstractModal{
 					JOptionPane.showMessageDialog(new JFrame(), "Invalid Input : Should contain no specials chars and must start with an alphabet", "Dialog",
 		    		        JOptionPane.ERROR_MESSAGE);
 				}else {
+					 dispose();
 					 parentView.captureEventFromChildSubFrame(new ViewMessage(Constant.ViewMessages.NEW_PROJECT_NAME , projectName));
 				}
 			}

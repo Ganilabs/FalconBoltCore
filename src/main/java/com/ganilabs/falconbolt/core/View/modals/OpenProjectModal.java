@@ -4,8 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -21,8 +21,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
 import com.ganilabs.falconbolt.core.View.AbstractWorkView;
+import com.ganilabs.falconbolt.core.View.ChildFrameListener;
 import com.ganilabs.falconbolt.core.View.ViewMessage;
 import com.ganilabs.falconbolt.core.View.components.Card;
 import com.ganilabs.falconbolt.core.View.components.TransparentButton;
@@ -30,8 +36,12 @@ import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 
-public class OpenProjectModal extends AbstractModal{
-	AbstractWorkView parentView;
+public class OpenProjectModal extends AbstractModal implements ChildFrameListener{
+	private AbstractWorkView parentView;
+	private OpenProjectModal thisReference = this;
+	private JPanel contentPanel;
+	public final static Logger LOGGER= LogManager.getLogger(OpenProjectModal.class);
+	
 	List<ProjectDTO> projects;
 	public OpenProjectModal(AbstractWorkView parentView, String title , List<ProjectDTO> projects) {
 		super(parentView, title);
@@ -47,15 +57,39 @@ public class OpenProjectModal extends AbstractModal{
 				try {
 					createUI();
 				}catch(Exception e) {
+					LOGGER.error(e.getMessage() , e);
 					parentView.update(Constant.ErrorMessages.RESOURCE_FAILED_TO_LOAD);
 				}
 			}
 		});
 	}
 	
+	@Override
+	public void captureEventFromChildSubFrame(ViewMessage message) {
+		switch(message.getMsgType()) {
+		case Constant.ViewMessages.DELETE_SELECTED_PROJECT:
+			dispose();
+			parentView.captureEventFromChildSubFrame(message);
+			break;
+		}
+	}
 	private void createUI() throws IOException{
 		JPanel mainPanel = new JPanel( new BorderLayout());
-		JPanel contentPanel = new JPanel();
+		setupContentPanel();
+		JPanel westPanel = new JPanel();
+		westPanel.setSize(50 , 600);
+		westPanel.setBackground(StyleConstants.BACKGROUND_PRIMARY);
+		mainPanel.add(westPanel , BorderLayout.WEST);
+		mainPanel.add(contentPanel , BorderLayout.CENTER);
+		this.setContentPane(mainPanel);
+		this.setSize(600 , 600);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setVisible(true);
+		
+	}
+	
+	private void setupContentPanel() throws IOException {
+		contentPanel = new JPanel();
 		contentPanel.setBackground(StyleConstants.BACKGROUND_PRIMARY);
 		BoxLayout layout = new BoxLayout(contentPanel , BoxLayout.Y_AXIS);
 		contentPanel.setLayout(layout);
@@ -70,15 +104,6 @@ public class OpenProjectModal extends AbstractModal{
 			contentPanel.add(createCardForProject(project));
 			contentPanel.add(Box.createVerticalStrut(7));
 		}
-		JPanel westPanel = new JPanel();
-		westPanel.setSize(50 , 600);
-		westPanel.setBackground(StyleConstants.BACKGROUND_PRIMARY);
-		mainPanel.add(westPanel , BorderLayout.WEST);
-		mainPanel.add(contentPanel , BorderLayout.CENTER);
-		this.setContentPane(mainPanel);
-		this.setSize(600 , 600);
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		this.setVisible(true);
 	}
 	
 	private Card createCardForProject(ProjectDTO project) throws IOException {
@@ -91,11 +116,16 @@ public class OpenProjectModal extends AbstractModal{
 		JButton projectButton = new TransparentButton( project.getProjectName(),scaledLightningIcon , StyleConstants.BACKGROUND_SECONDARY);
 		projectButton.setPreferredSize(new Dimension(350 , projectButton.getPreferredSize().height));
 		projectButton.setHorizontalAlignment(SwingConstants.LEFT);
-		projectButton.addActionListener(new ActionListener() {
+		projectButton.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-				parentView.captureEventFromChildSubFrame(new ViewMessage(Constant.ViewMessages.OPEN_SELECTED_PROJECT , project.getProjectId()));
+			public void mousePressed(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					dispose();
+					parentView.captureEventFromChildSubFrame(new ViewMessage(Constant.ViewMessages.OPEN_SELECTED_PROJECT , project.getProjectId()));
+				}else {
+					ProjectPopUpMenu popMenu = new ProjectPopUpMenu(project.getProjectId() , thisReference);
+					popMenu.show(e.getComponent() , e.getX() , e.getY());
+				}
 			}
 		});
 		cardContent.add(projectButton);

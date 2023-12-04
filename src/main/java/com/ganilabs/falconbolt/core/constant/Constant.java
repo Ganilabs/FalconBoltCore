@@ -4,6 +4,7 @@ public class Constant {
     public static final String APP_TITLE = "Falcon Bolt";
     public static class ModelChangeMessages{
         public static final String NEW_PLUGIN_FOUND = "newPluginFound";
+        public static final String PROJECT_CRUD = "projectCRUD";
     }
     public static class ErrorMessages{
     	public static final String ERROR_ENCOUNTERED = "errorEncountered";
@@ -15,6 +16,7 @@ public class Constant {
     	public static final String NEW_PROJECT_NAME = "newProjectName";
     	public static final String OPERATION_SUCCESS = "operationSuccess";
     	public static final String OPEN_SELECTED_PROJECT = "openSelectedProject";
+    	public static final String DELETE_SELECTED_PROJECT = "deleteSelectedProject";
     }
     
 }

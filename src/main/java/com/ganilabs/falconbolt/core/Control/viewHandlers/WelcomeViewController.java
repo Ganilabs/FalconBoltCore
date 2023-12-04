@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.HibernateException;
 
 import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
@@ -17,20 +18,26 @@ import com.ganilabs.falconbolt.core.exceptions.DataStateConflictException;
 
 public class WelcomeViewController {
 	private Model model = Model.getSingleton();
+	private ProjectRepository projectRepo;
 	private final static Logger LOGGER = LogManager.getLogger(WelcomeViewController.class);
 	
-	public void createNewProject(String projectName) {
+	public WelcomeViewController() {
 		try {
 			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
 			if(repoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
-			ProjectRepository repo = repoOp.get();
-			ProjectDTO project = new ProjectDTO();
-			project.setProjectName(projectName);
-			repo.createNewProject(project);
-			this.model.externalNotifyLiveView(Constant.ViewMessages.OPERATION_SUCCESS , "New Project Created");
+			projectRepo = repoOp.get();
 		}catch(NoSuchElementException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+		}
+	}
+	public void createNewProject(String projectName) {
+		try {
+			ProjectDTO project = new ProjectDTO();
+			project.setProjectName(projectName);
+			projectRepo.createNewProject(project);
+			this.model.externalNotifyLiveView(Constant.ViewMessages.OPERATION_SUCCESS , "New Project Created");
+			this.model.notifyObservers(Constant.ModelChangeMessages.PROJECT_CRUD);
 		}catch(DataStateConflictException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.CUSTOM_ERROR_MESSAGE , e.getMessage());
@@ -39,32 +46,30 @@ public class WelcomeViewController {
 	}
 	
 	public List<ProjectDTO> getAllProjects() {
+		return projectRepo.getAllProjects();
+	}
+	
+	public List<ProjectDTO> getAllProjectsSortedByOpeningTime(Integer numRecords){
 		try {
-			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
-			if(repoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
-			ProjectRepository repo = repoOp.get();
-			return repo.getAllProjects();
-		}catch(NoSuchElementException e) {
+			List<ProjectDTO> receivedProjects= projectRepo.getAllProjects();
+			Collections.sort(receivedProjects , ProjectDTO.COMPARE_BY_OPENEDTIME);
+			Collections.reverse(receivedProjects);
+			return receivedProjects.stream().limit(numRecords).collect(Collectors.toList());
+		}catch(HibernateException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
 		}
 		return List.of();
 	}
 	
-	public List<ProjectDTO> getAllProjectsSortedByOpeningTime(Integer numRecords){
+	public void deleteProjectByProjectId(Integer id) {
 		try {
-			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
-			if(repoOp.isEmpty()) throw new NoSuchElementException("Project Repository not found");
-			ProjectRepository repo = repoOp.get();
-			List<ProjectDTO> receivedProjects= repo.getAllProjects();
-			Collections.sort(receivedProjects , ProjectDTO.COMPARE_BY_OPENEDTIME);
-			Collections.reverse(receivedProjects);
-			return receivedProjects.stream().limit(numRecords).collect(Collectors.toList());
-			
-		}catch(NoSuchElementException e) {
+			projectRepo.deleteProjectById(id);
+			model.notifyObservers(Constant.ModelChangeMessages.PROJECT_CRUD);
+		}catch(HibernateException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
 		}
-		return List.of();
+		
 	}
 }

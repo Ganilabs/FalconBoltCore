@@ -61,7 +61,7 @@ public class Model {
 
     //changeMsg is used to inform the observers which part of model is updated so
     //Only the interested views can take further action.
-    private void notifyObservers(String changeMsg){
+    public void notifyObservers(String changeMsg){
         for(ModelObserver observer : this.observers){
             observer.update(changeMsg);
         }

@@ -1,8 +1,9 @@
 package com.ganilabs.falconbolt.core.View;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.logging.LogManager;
+import java.awt.CardLayout;
+import java.awt.LayoutManager;
+
+import javax.swing.JPanel;
 
 public class MainPanel extends JPanel{
     private JPanel workArea = new JPanel();

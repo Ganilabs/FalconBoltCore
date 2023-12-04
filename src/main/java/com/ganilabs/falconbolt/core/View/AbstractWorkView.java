@@ -8,9 +8,8 @@ import com.ganilabs.falconbolt.core.Model.Model;
 import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.constant.Constant;
 
-public abstract class AbstractWorkView extends JPanel implements ModelObserver {
+public abstract class AbstractWorkView extends JPanel implements ModelObserver, ChildFrameListener {
 	public abstract String getViewName();
-	public abstract void captureEventFromChildSubFrame(ViewMessage message);
     protected Model model;
     protected AbstractWorkView(Model model) {
     	this.model = model;
@@ -41,6 +40,7 @@ public abstract class AbstractWorkView extends JPanel implements ModelObserver {
     	case Constant.ViewMessages.OPERATION_SUCCESS:
     		JOptionPane.showMessageDialog(new JFrame(), displayData, "Dialog",
     		        JOptionPane.INFORMATION_MESSAGE);
+    		break;
     	case Constant.ErrorMessages.CUSTOM_ERROR_MESSAGE:
     		JOptionPane.showMessageDialog(new JFrame(), displayData, "Dialog",
     		        JOptionPane.ERROR_MESSAGE);

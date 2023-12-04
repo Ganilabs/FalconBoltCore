@@ -8,10 +8,10 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JFrame;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,9 +19,8 @@ import org.apache.logging.log4j.Logger;
 import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
-import com.ganilabs.falconbolt.core.Model.ModelObserver;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
-import com.ganilabs.falconbolt.core.constant.Constant;
+import com.ganilabs.falconbolt.core.constant.StyleConstants;
 
 public class View{
     private static final Logger LOGGER = LogManager.getLogger(View.class);
@@ -54,7 +53,7 @@ public class View{
     }
 
     public void init(){
-//    	this.setLookAndFeel();
+    	this.setLookAndFeel();
     	this.loadWorkViews();
         this.initializeUI();
     }
@@ -66,16 +65,12 @@ public class View{
     	System.out.print(this.loadedViews.size());
     }
     
-//    private void setLookAndFeel() {
-//    	try {
-//    		BasicLookAndFeel darcula = new DarculaLaf();
-//            UIManager.setLookAndFeel(darcula);
-//    	}catch(Exception e) {
-//    		LOGGER.error(e.getMessage() , e);
-//    		model.shutDownGracefully();
-//    	}
-//    	
-//    }
+    private void setLookAndFeel() {
+    	UIManager.put("PopupMenu.border",
+				BorderFactory.createMatteBorder(1,1, 1, 1 , StyleConstants.FOREGROUND_SECONDARY)
+				);
+    	UIManager.put("MenuItem.border", BorderFactory.createEmptyBorder());
+    }
 
     public void setView (AbstractWorkView view){
     	model.setLiveView(view);

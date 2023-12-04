@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -31,7 +32,7 @@ public class ProjectRepoImpl implements ProjectRepository {
 	@Override
 	public List<ProjectDTO> getAllProjects(){
 		List<ProjectDTO> projectDTOs = new ArrayList<>();
-		String hql = "SELECT P.id , P.name,P.createdAt FROM Project P";
+		String hql = "SELECT P.id , P.name,P.createdAt , P.openedAt FROM Project P";
 		Session session = sf.openSession();
 		List<Object[]> returnedProjects = session.createQuery(hql).list();
 		for(Object[]  row: returnedProjects) {
@@ -39,11 +40,19 @@ public class ProjectRepoImpl implements ProjectRepository {
 			project.setName((String)row[1]);
 			project.setProject_id((Integer)row[0]);
 			project.setCreatedAt((Timestamp)row[2]);
+			project.setOpenedAt((Timestamp)row[3]);
 			projectDTOs.add(ProjectDTO.fromEntity(project));
 		}
 		session.close();
 		return projectDTOs;
 	}
+	@Override
+	public void deleteProjectById(Integer Id)throws HibernateException {
+		String hql = "DELETE from Project Where id = :id";
+		Session session = sf.openSession();
+		session.createQuery(hql).setParameter("id", Id).executeUpdate();	
+		session.close();
+	};
 	
 	private Boolean projectWithNameExists(String name , Session hibernateSession) {
 		String hql = "SELECT P from Project P where P.name = :entityName";
@@ -51,6 +60,8 @@ public class ProjectRepoImpl implements ProjectRepository {
 		        .setParameter("entityName", name).list();
 		if (resultList.isEmpty()) return false;
 		return true;
-	};
+	}
+
+	
 
 }

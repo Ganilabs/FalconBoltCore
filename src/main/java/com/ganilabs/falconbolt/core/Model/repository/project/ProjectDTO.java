@@ -38,7 +38,7 @@ public class ProjectDTO{
 		projectDTO.setProjectName(project.getName());
 		projectDTO.setProjectId(project.getProject_id());
 		projectDTO.setCreatedAt(project.getCreatedAt().toLocalDateTime());
-		projectDTO.setOpenedAt(project.openedAt.toLocalDateTime());
+		projectDTO.setOpenedAt(project.getOpenedAt().toLocalDateTime());
 		return projectDTO;
 	}
 	public static Comparator<ProjectDTO> COMPARE_BY_OPENEDTIME = new Comparator<ProjectDTO>() {

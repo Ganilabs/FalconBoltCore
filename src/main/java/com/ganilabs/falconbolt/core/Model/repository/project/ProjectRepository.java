@@ -8,4 +8,5 @@ public interface ProjectRepository {
 	public void createNewProject(ProjectDTO projectData) throws DataStateConflictException;
 	public ProjectDTO getProjectByName(String name);
 	public List<ProjectDTO> getAllProjects(); 
+	public void deleteProjectById(Integer Id);
 }
