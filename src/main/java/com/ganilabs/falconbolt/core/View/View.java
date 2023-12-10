@@ -1,12 +1,14 @@
 package com.ganilabs.falconbolt.core.View;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -15,11 +17,15 @@ import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.HibernateException;
 
 import com.ganilabs.falconbolt.core.Control.Control;
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WelcomeViewController;
+import com.ganilabs.falconbolt.core.Control.viewHandlers.WorkspaceViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.repository.general.GeneralRepository;
 import com.ganilabs.falconbolt.core.View.workViews.WelcomeWorkView;
+import com.ganilabs.falconbolt.core.View.workViews.WorkspaceWorkView;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 
 public class View{
@@ -61,8 +67,10 @@ public class View{
     private void loadWorkViews() {
     	AbstractWorkView welcomeView = new WelcomeWorkView(new WelcomeViewController() , this.model);
     	this.mainPanel.loadWorkView(welcomeView);
-    	this.loadedViews.put(welcomeView.getViewName(), welcomeView);
-    	System.out.print(this.loadedViews.size());
+    	view.loadedViews.put(welcomeView.getViewName(), welcomeView);
+    	AbstractWorkView workspaceView = new WorkspaceWorkView(new WorkspaceViewController() , this.model);
+    	this.mainPanel.loadWorkView(workspaceView);
+    	view.loadedViews.put(workspaceView.getViewName(), workspaceView);
     }
     
     private void setLookAndFeel() {
@@ -70,15 +78,34 @@ public class View{
 				BorderFactory.createMatteBorder(1,1, 1, 1 , StyleConstants.FOREGROUND_SECONDARY)
 				);
     	UIManager.put("MenuItem.border", BorderFactory.createEmptyBorder());
+    	UIManager.put("SplitPane.border", BorderFactory.createEmptyBorder());
+    	UIManager.put("SplitPane.dividerSize", 2);
+        UIManager.put("SplitPaneDivider.border", BorderFactory.createLineBorder(StyleConstants.FOREGROUND_SECONDARY, 2));
+//        UIManager.put("SplitPaneDivider.draggingColor", StyleConstants.FOREGROUND_SECONDARY);
     }
 
     public void setView (AbstractWorkView view){
-    	model.setLiveView(view);
-        this.mainPanel.displayWorkView(view.getViewName());
+    	try {
+    		model.setLiveView(view);
+            this.mainPanel.displayWorkView(view.getViewName());
+    	}catch(Exception e) {
+    		System.out.print(e.getMessage());
+    		model.shutDownGracefully();
+    	}
+    	
+    }
+    
+    public void setView(String viewName) {
+    	this.setView(view.loadedViews.get(viewName));
     }
 
     public void chooseWorkView(){
-        this.setView(this.loadedViews.get(WelcomeWorkView.VIEW_NAME));
+    	Optional<GeneralRepository> repoGeneralOp = model.getGeneralRepository();
+    	if(repoGeneralOp.isEmpty()) return;
+    	GeneralRepository repoGeneral = repoGeneralOp.get();
+    	Integer openedProjectId = repoGeneral.getOpenedProjectId();
+    	if(openedProjectId == null)this.setView(WelcomeWorkView.VIEW_NAME);
+    	else this.setView(WorkspaceWorkView.VIEW_NAME);
     }
 
     public void startApp(){
@@ -93,6 +120,19 @@ public class View{
             LOGGER.fatal(e.getMessage() , e);
             System.exit(1);
         }
+    }
+    
+    public void closeOpenedProject() {
+    	try {
+    		Optional<GeneralRepository> repoOp = model.getGeneralRepository();
+        	if(repoOp.isEmpty()) return;
+        	GeneralRepository repo = repoOp.get();
+        	repo.setOpenedProject(null);
+        	this.setView(view.loadedViews.get(WelcomeWorkView.VIEW_NAME));
+    	}catch(HibernateException e) {
+    		LOGGER.error(e.getMessage() , e);
+    	}
+    	
     }
 
     private void initializeUI(){

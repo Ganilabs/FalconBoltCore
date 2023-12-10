@@ -11,14 +11,18 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 
 import com.ganilabs.falconbolt.core.Model.Model;
+import com.ganilabs.falconbolt.core.Model.repository.general.GeneralRepository;
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectDTO;
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectRepository;
+import com.ganilabs.falconbolt.core.View.AbstractWorkView;
+import com.ganilabs.falconbolt.core.View.View;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.exceptions.DataStateConflictException;
 
 public class WelcomeViewController {
 	private Model model = Model.getSingleton();
 	private ProjectRepository projectRepo;
+	private GeneralRepository generalRepo;
 	private final static Logger LOGGER = LogManager.getLogger(WelcomeViewController.class);
 	
 	public WelcomeViewController() {
@@ -26,6 +30,9 @@ public class WelcomeViewController {
 			Optional<ProjectRepository> repoOp =  model.getProjectRepository();
 			if(repoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
 			projectRepo = repoOp.get();
+			Optional<GeneralRepository> generalRepoOp = model.getGeneralRepository();
+			if(generalRepoOp.isEmpty()) throw new NoSuchElementException("ProjectRepository not found");
+			generalRepo = generalRepoOp.get();
 		}catch(NoSuchElementException e) {
 			LOGGER.error(e.getMessage() , e);
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
@@ -71,5 +78,10 @@ public class WelcomeViewController {
 			this.model.externalNotifyLiveView(Constant.ErrorMessages.ERROR_ENCOUNTERED);
 		}
 		
+	}
+	
+	public void openSelectedProject(String viewName , Integer projectId) {
+		generalRepo.setOpenedProject(projectId);
+		View.getSingleton().setView(viewName);
 	}
 }

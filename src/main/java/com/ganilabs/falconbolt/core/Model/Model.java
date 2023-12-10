@@ -11,6 +11,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
+import com.ganilabs.falconbolt.core.Model.repository.general.GeneralRepository;
 import com.ganilabs.falconbolt.core.Model.repository.project.ProjectRepository;
 import com.ganilabs.falconbolt.core.config.HibernateHelper;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
@@ -87,6 +88,20 @@ public class Model {
     public Optional<ProjectRepository> getProjectRepository(){
     	try {
     		return Optional.ofNullable((ProjectRepository) SpringContextProvider.getRepositoryContext().getBean(ProjectRepository.class));
+    	}catch(NoSuchBeanDefinitionException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    		
+    	}catch(BeansException e) {
+    		LOGGER.error(e.getMessage() , e);
+    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+    	}
+    	return Optional.empty();
+    }
+    
+    public Optional<GeneralRepository> getGeneralRepository(){
+    	try {
+    		return Optional.ofNullable((GeneralRepository) SpringContextProvider.getRepositoryContext().getBean(GeneralRepository.class));
     	}catch(NoSuchBeanDefinitionException e) {
     		LOGGER.error(e.getMessage() , e);
     		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);

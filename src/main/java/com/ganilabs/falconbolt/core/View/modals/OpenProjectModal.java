@@ -71,6 +71,9 @@ public class OpenProjectModal extends AbstractModal implements ChildFrameListene
 			dispose();
 			parentView.captureEventFromChildSubFrame(message);
 			break;
+		case Constant.ViewMessages.OPEN_SELECTED_PROJECT:
+			dispose();
+			parentView.captureEventFromChildSubFrame(message);
 		}
 	}
 	private void createUI() throws IOException{
@@ -129,7 +132,6 @@ public class OpenProjectModal extends AbstractModal implements ChildFrameListene
 			}
 		});
 		cardContent.add(projectButton);
-//		cardContent.add(Box.createHorizontalStrut(250));
 		JLabel createdOn = new JLabel("Created On : " + project.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 		createdOn.setFont(StyleConstants.NORMAL_TEXT);
 		createdOn.setForeground(StyleConstants.FOREGROUND_SECONDARY);

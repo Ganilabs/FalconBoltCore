@@ -185,7 +185,6 @@ public class WelcomeWorkView extends AbstractWorkView{
     
     private void setupRecentPanel() throws IOException {
     	List<ProjectDTO> recentProjectsList = controller.getAllProjectsSortedByOpeningTime(15);
-    	System.out.print("IN RECENTS PANEL ");
     	recentsPanel.setBackground(StyleConstants.BACKGROUND_SECONDARY);
     	JLabel heading = new JLabel(DisplayTextResources.RECENT_PROJECTS);
     	heading.setFont(StyleConstants.HEADING_SUB2);
@@ -240,6 +239,7 @@ public class WelcomeWorkView extends AbstractWorkView{
     		break;
     	case Constant.ViewMessages.OPEN_SELECTED_PROJECT:
     		LOGGER.info("Opening project {}" , msg.getMsgData());
+    		controller.openSelectedProject(WorkspaceWorkView.VIEW_NAME ,(Integer) msg.getMsgData());
     		break;
     	case Constant.ViewMessages.DELETE_SELECTED_PROJECT:
     		LOGGER.info("Deleting project {}" , msg.getMsgData());
@@ -267,7 +267,8 @@ public class WelcomeWorkView extends AbstractWorkView{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				if(e.getButton() == MouseEvent.BUTTON1) {
-					System.out.print("Clicked open");
+					LOGGER.info("Opening project {}" , project.getProjectId());
+					controller.openSelectedProject(WorkspaceWorkView.VIEW_NAME , project.getProjectId());
 				}else {
 					ProjectPopUpMenu popUp = new ProjectPopUpMenu(project.getProjectId() , thisReference);
 					popUp.show(e.getComponent() , e.getX() , e.getY());

@@ -17,6 +17,7 @@ public class Constant {
     	public static final String OPERATION_SUCCESS = "operationSuccess";
     	public static final String OPEN_SELECTED_PROJECT = "openSelectedProject";
     	public static final String DELETE_SELECTED_PROJECT = "deleteSelectedProject";
+    	public static final String CLOSE_OPENED_PROJECT = "closeOpenedProject";
     }
     
 }

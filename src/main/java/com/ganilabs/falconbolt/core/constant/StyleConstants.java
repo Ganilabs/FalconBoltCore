@@ -15,5 +15,6 @@ public class StyleConstants {
 	public final static Font HEADING_SUB2 = new Font(Font.SANS_SERIF , Font.PLAIN , 30);
 	public final static Font HEADING_SUB3 = new Font(Font.SANS_SERIF , Font.PLAIN , 20);
 	public final static Font NORMAL_TEXT = new Font(Font.SANS_SERIF , Font.PLAIN , 15);
+	public final static Font SMALL_TEXT = new Font(Font.SANS_SERIF , Font.PLAIN , 12);
 	
 }

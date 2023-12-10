@@ -1,7 +1,6 @@
 package com.ganilabs.falconbolt.core.View.components;
 
 import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import com.ganilabs.falconbolt.core.View.ChildFrameListener;

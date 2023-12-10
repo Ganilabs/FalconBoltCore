@@ -10,4 +10,9 @@ public class DisplayTextResources {
 	public final static String RECENT_PROJECTS = "Recent : ";
 	public final static String OPEN = "Open";
 	public final static String DELETE = "Delete";
+	public final static String MENU_BAR_PROJECT = "Project";
+	public final static String MENU_BAR_VIEW = "View";
+	public final static String MENU_BAR_WINDOW = "Window";
+	public final static String MENU_BAR_HELP = "Help";
+	public final static String MENU_ITEM_CLOSE_PROJECT = "Close Project";
 }
