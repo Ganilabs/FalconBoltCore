@@ -18,4 +18,5 @@ public class DisplayTextResources {
 	public final static String TOOLBOX_HEADING = "Tool Box";
 
 	public final static String WELCOME_TEXT = "Welcome to Falcon Bolt. Select a tool to get started";
+	public final static String CLOSE = "Close";
 }

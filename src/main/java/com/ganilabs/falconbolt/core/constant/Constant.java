@@ -19,5 +19,10 @@ public class Constant {
     	public static final String DELETE_SELECTED_PROJECT = "deleteSelectedProject";
     	public static final String CLOSE_OPENED_PROJECT = "closeOpenedProject";
     }
+
+    public static class ToolMessages{
+        public static final String OPEN_CLOSED_TOOL = "openClosedTool";
+        public static final String CLOSE_SELECTED_TOOL = "closeSelectedTool";
+    }
     
 }

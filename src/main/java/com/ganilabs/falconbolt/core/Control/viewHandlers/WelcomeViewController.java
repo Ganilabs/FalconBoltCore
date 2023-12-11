@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ganilabs.falconbolt.core.Model.tools.OpenedTools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -81,7 +82,15 @@ public class WelcomeViewController {
 	}
 	
 	public void openSelectedProject(String viewName , Integer projectId) {
+		this.preOpenProject();
 		generalRepo.setOpenedProject(projectId);
 		View.getSingleton().setView(viewName);
+	}
+
+	private void preOpenProject(){
+		Optional<OpenedTools> openedToolsOptional= model.getOpenedTools();
+		if(openedToolsOptional.isEmpty()) return;
+		OpenedTools openedTools = openedToolsOptional.get();
+		openedTools.closeAllTools();
 	}
 }

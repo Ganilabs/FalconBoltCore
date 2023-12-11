@@ -16,4 +16,7 @@ public class OpenedTools {
     public Set<AbstractTool> getAllOpenedTools(){
         return this.openedTools;
     }
+    public void closeAllTools(){
+        this.openedTools = new HashSet<>();
+    }
 }
