@@ -15,4 +15,7 @@ public class DisplayTextResources {
 	public final static String MENU_BAR_WINDOW = "Window";
 	public final static String MENU_BAR_HELP = "Help";
 	public final static String MENU_ITEM_CLOSE_PROJECT = "Close Project";
+	public final static String TOOLBOX_HEADING = "Tool Box";
+
+	public final static String WELCOME_TEXT = "Welcome to Falcon Bolt. Select a tool to get started";
 }

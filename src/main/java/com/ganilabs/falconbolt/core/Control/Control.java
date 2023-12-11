@@ -9,6 +9,9 @@ import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import com.ganilabs.falconbolt.core.Model.tools.ToolsFactory;
+import com.ganilabs.falconbolt.core.Model.tools.ToolsStore;
+import com.ganilabs.falconbolt.interfaces.constants.PluginConstants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -49,11 +52,11 @@ public class Control {
     public void init(){
         LOGGER.info("Initializing controller");
         this.loadPlugins();
+		this.loadTools();
         this.setupMessageQueues();
         this.populateMessageQueuesAndPluginMessageDispatchers();
     }
-    
-   
+
 	private void loadPlugins() {
     	Optional<PluginStore> pluginStoreOp = model.getPluginStore();
     	if(pluginStoreOp.isEmpty()) {
@@ -73,6 +76,28 @@ public class Control {
     	}
     	
     }
+
+	private void loadTools() {
+		Optional<PluginStore> pluginStoreOp = model.getPluginStore();
+		if(pluginStoreOp.isEmpty()) {
+			LOGGER.error("Plugins failed to load. Store is null");
+			model.externalNotifyLiveView(Constant.ErrorMessages.PLUGINS_FAILED_TO_LOAD);
+		}
+		PluginStore pluginStore = pluginStoreOp.get();
+		Map<String , PluginAPI> pluginsAPIMap = pluginStore.getAllLoadedPlugins();
+		Set<String> pluginKeySet = pluginsAPIMap.keySet();
+		ToolsFactory toolsFactory = new ToolsFactory();
+		for(String pluginKey : pluginKeySet){
+			try{
+				PluginAPI plugin = pluginsAPIMap.get(pluginKey);
+				if(plugin.getPluginType().get(0).equals(PluginConstants.PluginTypeConstants.TOOL))
+					toolsFactory.createToolAndAddToStore(plugin.getPluginType().get(1) , plugin);
+			}catch(ClassNotFoundException e) {
+				LOGGER.error(e.getMessage(), e);
+				model.externalNotifyLiveView(Constant.ErrorMessages.CUSTOM_ERROR_MESSAGE , "Failed to load tool ");
+			}
+		}
+	}
     
     private void setupMessageQueues() {
     	Optional<InterProcessMessages> ipcMessagesOptional = this.getIPCMessages();

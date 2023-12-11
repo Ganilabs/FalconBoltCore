@@ -4,11 +4,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import com.ganilabs.falconbolt.core.Model.tools.OpenedTools;
+import com.ganilabs.falconbolt.core.Model.tools.ToolsStore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.Model.repository.general.GeneralRepository;
@@ -87,12 +88,8 @@ public class Model {
     
     public Optional<ProjectRepository> getProjectRepository(){
     	try {
-    		return Optional.ofNullable((ProjectRepository) SpringContextProvider.getRepositoryContext().getBean(ProjectRepository.class));
-    	}catch(NoSuchBeanDefinitionException e) {
-    		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
-    		
-    	}catch(BeansException e) {
+    		return Optional.of((ProjectRepository) SpringContextProvider.getRepositoryContext().getBean(ProjectRepository.class));
+    	} catch(BeansException e) {
     		LOGGER.error(e.getMessage() , e);
     		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
@@ -101,12 +98,8 @@ public class Model {
     
     public Optional<GeneralRepository> getGeneralRepository(){
     	try {
-    		return Optional.ofNullable((GeneralRepository) SpringContextProvider.getRepositoryContext().getBean(GeneralRepository.class));
-    	}catch(NoSuchBeanDefinitionException e) {
-    		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
-    		
-    	}catch(BeansException e) {
+    		return Optional.of((GeneralRepository) SpringContextProvider.getRepositoryContext().getBean(GeneralRepository.class));
+    	} catch(BeansException e) {
     		LOGGER.error(e.getMessage() , e);
     		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
@@ -116,15 +109,31 @@ public class Model {
     
     public Optional<PluginStore> getPluginStore(){
     	try {
-    		return Optional.ofNullable((PluginStore)SpringContextProvider.getModelContext().getBean(PluginStore.class));
-    	}catch(NoSuchBeanDefinitionException e) {
-    		LOGGER.error(e.getMessage() , e);
-    		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
-    		
-    	}catch(BeansException e) {
+    		return Optional.of((PluginStore)SpringContextProvider.getModelContext().getBean(PluginStore.class));
+    	} catch(BeansException e) {
     		LOGGER.error(e.getMessage() , e);
     		this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
     	}
     	return Optional.empty();	
+    }
+
+    public Optional<OpenedTools> getOpenedTools(){
+        try {
+            return Optional.of((OpenedTools) SpringContextProvider.getModelContext().getBean(OpenedTools.class));
+        } catch(BeansException e) {
+            LOGGER.error(e.getMessage() , e);
+            this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<ToolsStore> getToolsStore(){
+        try{
+            return Optional.of(SpringContextProvider.getModelContext().getBean(ToolsStore.class));
+        }catch(BeansException e){
+            LOGGER.error(e.getMessage() , e);
+            this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
+        }
+        return Optional.empty();
     }
 }
