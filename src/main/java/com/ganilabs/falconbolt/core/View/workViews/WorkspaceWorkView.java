@@ -26,6 +26,7 @@ import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 import com.ganilabs.falconbolt.interfaces.plugin.PluginAPI;
+import com.ganilabs.falconbolt.interfaces.pluginmessages.ScanResultMessage;
 
 public class WorkspaceWorkView extends AbstractWorkView{
 	public final static String VIEW_NAME = "Workspace View";
@@ -85,6 +86,14 @@ public class WorkspaceWorkView extends AbstractWorkView{
 						toolContentPanel.removeAll();
 						toolContentPanel.add(prepareDefaultTool());
 						toolContentPanel.repaint();
+					}
+				});
+				break;
+			case Constant.ToolMessages.SCAN_RESULT_CHANGE:
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+
 					}
 				});
 		}
@@ -201,6 +210,9 @@ public class WorkspaceWorkView extends AbstractWorkView{
 	}
 
 	private void initRightTasksBar() {
+		this.rightTasksBar.removeAll();
+		this.rightTasksBar.revalidate();
+		Set<ScanResultMessage> scanResults= model.getScanResultMessages();
 		this.rightTasksBar.setBackground(StyleConstants.BACKGROUND_SECONDARY);
 		this.rightTasksBar.setForeground(StyleConstants.FOREGROUND_PRIMARY);
 		this.rightTasksBar.setMaximumSize(new Dimension((int) 0.3 * this.screenDimension.width, this.screenDimension.height));

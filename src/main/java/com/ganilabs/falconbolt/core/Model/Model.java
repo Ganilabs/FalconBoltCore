@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.ganilabs.falconbolt.core.Model.tools.OpenedTools;
 import com.ganilabs.falconbolt.core.Model.tools.ToolsStore;
+import com.ganilabs.falconbolt.interfaces.pluginmessages.ScanResultMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -21,6 +22,7 @@ import com.ganilabs.falconbolt.core.constant.Constant;
 public class Model {
     private static final Logger LOGGER = LogManager.getLogger(Model.class);
     private final Set<ModelObserver> observers= new HashSet<>();
+    private final Set<ScanResultMessage> scanResultMessages= new HashSet<>();
     private static Model model;
     ModelObserver liveView;
     private Model(){};
@@ -135,5 +137,13 @@ public class Model {
             this.liveView.update(Constant.ErrorMessages.ERROR_ENCOUNTERED);
         }
         return Optional.empty();
+    }
+
+    public Set<ScanResultMessage> getScanResultMessages() {
+        return scanResultMessages;
+    }
+
+    public void addScanResultsMessage(ScanResultMessage result){
+        this.scanResultMessages.add(result);
     }
 }

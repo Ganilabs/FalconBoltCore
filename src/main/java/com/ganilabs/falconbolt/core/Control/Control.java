@@ -12,6 +12,8 @@ import java.util.Set;
 import com.ganilabs.falconbolt.core.Model.tools.ToolsFactory;
 import com.ganilabs.falconbolt.core.Model.tools.ToolsStore;
 import com.ganilabs.falconbolt.interfaces.constants.PluginConstants;
+import com.ganilabs.falconbolt.interfaces.plugin.*;
+import com.ganilabs.falconbolt.interfaces.pluginmessages.ScanResultMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -22,11 +24,8 @@ import com.ganilabs.falconbolt.core.Model.plugin.PluginStore;
 import com.ganilabs.falconbolt.core.config.SpringContextProvider;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.InterProcessMessages;
-import com.ganilabs.falconbolt.interfaces.plugin.MessageQueue;
-import com.ganilabs.falconbolt.interfaces.plugin.PluginAPI;
-import com.ganilabs.falconbolt.interfaces.plugin.PluginMessageDispatcher;
 
-public class Control {
+public class Control implements PluginMessageListener {
     private static Control control;
     private static final Logger LOGGER = LogManager.getLogger(Control.class);
     private Model model;
@@ -135,6 +134,7 @@ public class Control {
 			}
 			LOGGER.info("Setup Listeners and dispatchers for {} plugin. id : {}" , plugin.getValue().getPluginName() , plugin.getValue().getPluginId());
 		}
+		this.messageQueues.get("RESULT_GENERATED").addListener(this);
 	}
     
     private Optional<InterProcessMessages> getIPCMessages(){
@@ -150,4 +150,14 @@ public class Control {
     	return Optional.empty();
     	
     }
+
+	@Override
+	public void messageReceived(String name, PluginMessage<?> msg) {
+		switch (name){
+			case "RESULT_GENERATED":
+				ScanResultMessage scanResultMessage = (ScanResultMessage) msg;
+				System.out.println("in core");
+				System.out.println(scanResultMessage.getByPlugin() + " " + scanResultMessage.getScannedOn());
+		}
+	}
 }

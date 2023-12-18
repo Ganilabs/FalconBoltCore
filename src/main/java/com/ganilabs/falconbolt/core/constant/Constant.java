@@ -23,6 +23,7 @@ public class Constant {
     public static class ToolMessages{
         public static final String OPEN_CLOSED_TOOL = "openClosedTool";
         public static final String CLOSE_SELECTED_TOOL = "closeSelectedTool";
+        public static final String SCAN_RESULT_CHANGE = "SCAN_RESULT_CHANGED";
     }
     
 }
