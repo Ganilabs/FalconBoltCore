@@ -67,6 +67,7 @@ public class Control {
     		PluginStore store= pluginStoreOp.get();
         	ServiceLoader<PluginAPI> serviceLoader = ServiceLoader.load(PluginAPI.class);
         	for(PluginAPI plugin : serviceLoader) {
+				plugin.initPlugin();
         		store.addLoadedPlogin(plugin);
         		LOGGER.info("Loaded plugin : {} id :{} " , plugin.getPluginName() , plugin.getPluginId());
         	}

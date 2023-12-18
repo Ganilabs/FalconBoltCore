@@ -8,7 +8,7 @@ public class StyleConstants {
 	public final static Color BACKGROUND_SECONDARY = new Color(45 ,45 , 45);
 	public final static Color BACKGROUND_TERTIARY = new Color(70 , 70 , 70);
 	public final static Color FOREGROUND_PRIMARY = new Color(255 , 255 , 255);
-	public final static Color FOREGROUND_SECONDARY = new Color(150 , 150 , 150);
+	public final static Color FOREGROUND_SECONDARY = new Color(100 , 100 , 100);
 	public final static Color FOREGROUND_TERTIARY = new Color(200 ,200 , 200);
 	public final static Font HEADING_MAIN = new Font(Font.SANS_SERIF , Font.BOLD , 35);
 	public final static Font HEADING_SUB1 = new Font(Font.SANS_SERIF , Font.PLAIN , 35);

@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Optional;
 
 public class ToolsFactory {
-    public final static Logger LOGGER = LogManager.getLogger();
+    public final static Logger LOGGER = LogManager.getLogger(ToolsFactory.class);
     private ToolsStore toolsStore;
     public ToolsFactory(){
         Optional<ToolsStore> toolsStoreOp = Model.getSingleton().getToolsStore();
