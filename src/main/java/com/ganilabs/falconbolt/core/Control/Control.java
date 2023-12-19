@@ -158,6 +158,9 @@ public class Control implements PluginMessageListener {
 				ScanResultMessage scanResultMessage = (ScanResultMessage) msg;
 				System.out.println("in core");
 				System.out.println(scanResultMessage.getByPlugin() + " " + scanResultMessage.getScannedOn());
+				model.addScanResultsMessage(scanResultMessage);
+				model.notifyObservers(Constant.ToolMessages.SCAN_RESULT_CHANGE);
+
 		}
 	}
 }

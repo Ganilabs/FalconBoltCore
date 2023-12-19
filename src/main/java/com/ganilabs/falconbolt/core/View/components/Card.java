@@ -16,5 +16,6 @@ public class Card extends JPanel{
 		setForeground(StyleConstants.FOREGROUND_PRIMARY);
 		this.content = content;
 		add(content , BorderLayout.CENTER);
+		this.setMaximumSize(this.getPreferredSize());
 	}
 }

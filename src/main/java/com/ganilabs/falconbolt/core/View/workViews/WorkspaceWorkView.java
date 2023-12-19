@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.*;
+import javax.swing.text.Style;
 
 import com.ganilabs.falconbolt.core.Control.viewHandlers.WorkspaceViewController;
 import com.ganilabs.falconbolt.core.Model.Model;
@@ -18,14 +19,13 @@ import com.ganilabs.falconbolt.core.View.AbstractWorkView;
 import com.ganilabs.falconbolt.core.View.ChildFrameListener;
 import com.ganilabs.falconbolt.core.View.View;
 import com.ganilabs.falconbolt.core.View.ViewMessage;
-import com.ganilabs.falconbolt.core.View.components.ComponentHelper;
+import com.ganilabs.falconbolt.core.View.components.*;
 import com.ganilabs.falconbolt.core.View.components.MenuBar;
-import com.ganilabs.falconbolt.core.View.components.SelectedToolPopupMenu;
-import com.ganilabs.falconbolt.core.View.components.TransparentButton;
 import com.ganilabs.falconbolt.core.constant.Constant;
 import com.ganilabs.falconbolt.core.constant.DisplayTextResources;
 import com.ganilabs.falconbolt.core.constant.StyleConstants;
 import com.ganilabs.falconbolt.interfaces.plugin.PluginAPI;
+import com.ganilabs.falconbolt.interfaces.plugin.PluginMessageListener;
 import com.ganilabs.falconbolt.interfaces.pluginmessages.ScanResultMessage;
 
 public class WorkspaceWorkView extends AbstractWorkView{
@@ -93,7 +93,7 @@ public class WorkspaceWorkView extends AbstractWorkView{
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-
+						initRightTasksBar();
 					}
 				});
 		}
@@ -212,10 +212,23 @@ public class WorkspaceWorkView extends AbstractWorkView{
 	private void initRightTasksBar() {
 		this.rightTasksBar.removeAll();
 		this.rightTasksBar.revalidate();
+		BoxLayout layout = new BoxLayout(this.rightTasksBar , BoxLayout.Y_AXIS);
+		this.rightTasksBar.setLayout(layout);
+		JLabel resultsHeading = new JLabel(DisplayTextResources.RESULTS);
+		resultsHeading.setFont(StyleConstants.HEADING_SUB2);
+		resultsHeading.setForeground(StyleConstants.FOREGROUND_PRIMARY);
+		resultsHeading.setAlignmentX(CENTER_ALIGNMENT);
+		this.rightTasksBar.add(Box.createVerticalStrut(10));
+		this.rightTasksBar.add(resultsHeading);
+		this.rightTasksBar.add(Box.createVerticalStrut(10));
 		Set<ScanResultMessage> scanResults= model.getScanResultMessages();
+		for(ScanResultMessage scanResult : scanResults){
+			this.rightTasksBar.add(this.createButtonForScanResult(scanResult));
+		}
 		this.rightTasksBar.setBackground(StyleConstants.BACKGROUND_SECONDARY);
 		this.rightTasksBar.setForeground(StyleConstants.FOREGROUND_PRIMARY);
 		this.rightTasksBar.setMaximumSize(new Dimension((int) 0.3 * this.screenDimension.width, this.screenDimension.height));
+		this.rightTasksBar.repaint();
 	}
 
 	private TransparentButton createButtonForOpenedTool(AbstractTool tool) {
@@ -240,6 +253,34 @@ public class WorkspaceWorkView extends AbstractWorkView{
 		button.setFont(StyleConstants.SMALL_TEXT);
 		button.setBorder(BorderFactory.createEmptyBorder(2 , 4 , 2 , 4));
 		return button;
+	}
+
+	private Card createButtonForScanResult(ScanResultMessage result ){
+		JPanel cardContent = new JPanel();
+		BoxLayout layout = new BoxLayout(cardContent , BoxLayout.Y_AXIS);
+		cardContent.setLayout(layout);
+		TransparentButton button = new TransparentButton(
+				result.getScanMessage(),
+				StyleConstants.NORMAL_TEXT,
+				StyleConstants.BACKGROUND_PRIMARY
+		);
+		button.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				PluginMessageListener listener = model.getPluginStore().get().getAllLoadedPlugins().get(result.getByPlugin()).getPluginMessageListener();
+				listener.messageReceived("OPEN_RESULT" , result);
+			}
+		});
+		cardContent.add(button);
+		JLabel pluginDate = new JLabel("Scan by: " + result.getByPlugin() + " Time: " + result.getScannedOn().toString());
+		pluginDate.setFont(StyleConstants.SMALL_TEXT);
+		pluginDate.setForeground(StyleConstants.FOREGROUND_PRIMARY);
+		cardContent.add(pluginDate);
+		cardContent.setMaximumSize(cardContent.getPreferredSize());
+		cardContent.setBackground(StyleConstants.BACKGROUND_PRIMARY);
+		Card card = new Card(cardContent);
+		card.setAlignmentX(CENTER_ALIGNMENT);
+		return card;
 	}
 
 }
