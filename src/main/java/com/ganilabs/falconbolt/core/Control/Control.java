@@ -160,7 +160,7 @@ public class Control implements PluginMessageListener {
 				System.out.println(scanResultMessage.getByPlugin() + " " + scanResultMessage.getScannedOn());
 				model.addScanResultsMessage(scanResultMessage);
 				model.notifyObservers(Constant.ToolMessages.SCAN_RESULT_CHANGE);
-
+				break;
 		}
 	}
 }

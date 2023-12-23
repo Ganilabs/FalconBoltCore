@@ -40,7 +40,6 @@ public class MessageQueueImpl implements MessageQueue {
 	@Override
 	public void messageRecieved(PluginMessage<?> msg) {
 		this.dispatchMessage(msg);
-
 	}
 
 }

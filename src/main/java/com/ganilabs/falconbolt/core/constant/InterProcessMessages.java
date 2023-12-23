@@ -11,6 +11,7 @@ public class InterProcessMessages {
 		//adding messages directly as they will be constant
 		messages.add("RESULT_GENERATED");
 		messages.add("OPEN_RESULT");
+		messages.add("PORT_DISCOVERED");
 	}
 	public Set<String> getMessages() {
 		return this.messages;
